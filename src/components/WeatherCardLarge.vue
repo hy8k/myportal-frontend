@@ -11,10 +11,11 @@ import {
     mdiWeatherCloudyAlert,
     mdiUmbrellaClosedVariant,
     mdiWeatherSnowyHeavy,
-    mdiWeatherPartlySnowyRainy,
+    mdiWeatherSnowyRainy,
     mdiWeatherRainy,
     mdiWeatherSnowy,
-    mdiWeatherPouring
+    mdiWeatherPouring,
+    mdiWeatherWindy
 } from '@mdi/js';
 import { onBeforeUpdate } from 'vue';
 type RegexDict = { [key: string]: RegExp };
@@ -44,18 +45,19 @@ const iconList: Dict = {
     '曇り': mdiWeatherCloudy,
     '雨': mdiWeatherRainy,
     '雪': mdiWeatherSnowy,
-    '雪か雨': mdiWeatherPartlySnowyRainy,
+    '雪か雨': mdiWeatherSnowyRainy,
     '暴風雨': mdiWeatherPouring,
     '暴風雪': mdiWeatherSnowyHeavy,
+    '風雪強い': mdiWeatherWindy
 };
 
 const regexList: RegexDict = {
-    'type1': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)$/,
-    'type2': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)のち(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)$/,
-    'type3': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)時々(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)$/,
-    'type4': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)一時(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)$/,
-    'type5': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)のち時々(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)$/,
-    'type6': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)のち一時(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪)$/,
+    'type1': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)$/,
+    'type2': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)のち(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)$/,
+    'type3': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)時々(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)$/,
+    'type4': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)一時(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)$/,
+    'type5': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)のち時々(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)$/,
+    'type6': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)のち一時(晴|晴れ|曇|曇り|雨|雪|雪か雨|暴風雨|暴風雪|風雪強い)$/,
     'type7': /^(雨(一時|時々)止む)$/
 };
 
