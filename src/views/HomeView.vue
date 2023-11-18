@@ -184,7 +184,6 @@ export default {
                 </div>
             </div>
             <div class="description">
-                <h2>詳細な情報</h2>
                 <p>{{ weatherData['body']['description']['bodyText'] }}</p>
             </div>
         </div>
