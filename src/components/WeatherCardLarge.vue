@@ -59,7 +59,7 @@ const regexList: RegexDict = {
     'type4': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|雨か雪|暴風雨|暴風雪|風雪強い)一時(晴|晴れ|曇|曇り|雨|雪|雪か雨|雨か雪|暴風雨|暴風雪|風雪強い)$/,
     'type5': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|雨か雪|暴風雨|暴風雪|風雪強い)のち時々(晴|晴れ|曇|曇り|雨|雪|雪か雨|雨か雪|暴風雨|暴風雪|風雪強い)$/,
     'type6': /^(晴|晴れ|曇|曇り|雨|雪|雪か雨|雨か雪|暴風雨|暴風雪|風雪強い)のち一時(晴|晴れ|曇|曇り|雨|雪|雪か雨|雨か雪|暴風雨|暴風雪|風雪強い)$/,
-    'type7': /^(雨(一時|時々)止む)$/
+    'type7': /^(雨|雪)(一時|時々)止む$/
 };
 
 const parseTelop = () => {
@@ -107,7 +107,7 @@ const parseTelop = () => {
             } else if (type === 'type7') {
                 iconMid.value = undefined;
                 iconRight.value = undefined;
-                iconLeft.value = iconList['雨'];
+                iconLeft.value = iconList[res[1]];
             }
         };
     }
