@@ -9,6 +9,7 @@ type Dict = { [key: string]: any };
 
 const weatherData = ref();
 const forecasts = ref();
+const weatherWarningsData = ref();
 const location = ref('Sendai');
 const locationId: Dict = {
     'Sendai': '040010',
@@ -25,6 +26,21 @@ const locationId: Dict = {
     'Fukuoka': '400010',
     'Sapporo': '016010'
 };
+const areaId: Dict = {
+    'Sendai': '040000',
+    'Chiba': '120000',
+    'Wakkanai': '011000',
+    'Kumagaya': '110000',
+    'Naha': '471000',
+    'Niigata': '150000',
+    'Kyoto': '260000',
+    'Tokyo': '130000',
+    'Yonaguni': '474000',
+    'Hachijojima': '130000',
+    'Nagoya': '230000',
+    'Fukuoka': '400000',
+    'Sapporo': '016000'
+}
 const locationLatitude: Dict = {
     'Sendai': 38.2682,
     'Chiba': 35.60472,
@@ -56,9 +72,46 @@ const locationLongitude: Dict = {
     'Sapporo': 141.3543
 };
 
+const weatherWarnings: Dict = {
+    "02": "暴風雪警報",
+    "03": "大雨警報",
+    "04": "洪水警報",
+    "05": "暴風警報",
+    "06": "大雪警報",
+    "07": "波浪警報",
+    "08": "高潮警報",
+    "10": "大雨注意報",
+    "12": "大雪注意報",
+    "13": "風雪注意報",
+    "14": "雷注意報",
+    "15": "強風注意報",
+    "16": "波浪注意報",
+    "17": "融雪注意報",
+    "18": "洪水注意報",
+    "19": "高潮注意報",
+    "20": "濃霧注意報",
+    "21": "乾燥注意報",
+    "22": "なだれ注意報",
+    "23": "低温注意報",
+    "24": "霜注意報",
+    "25": "着氷注意報",
+    "26": "着雪注意報",
+    "27": "その他の注意報",
+    "32": "暴風雪特別警報",
+    "33": "大雨特別警報",
+    "35": "暴風特別警報",
+    "36": "大雪特別警報",
+    "37": "波浪特別警報",
+    "38": "高潮特別警報"
+};
+
 const sunCalcList = ref(SunCalc.getTimes(new Date(), locationLatitude[location.value], locationLongitude[location.value]));
 const sunriseTime = ref(sunCalcList.value.sunrise.getHours().toString() + ':' + ('0' + sunCalcList.value.sunrise.getMinutes().toString()).slice(-2));
 const sunsetTime = ref(sunCalcList.value.sunset.getHours().toString() + ':' + ('0' + sunCalcList.value.sunset.getMinutes().toString()).slice(-2));
+
+const advisoryList = ref<Array<string>>([]);
+const warningList = ref<Array<string>>([]);
+const emergencyWarningList = ref<Array<string>>([]);
 
 const fetchWeatherData = async () => {
     try {
@@ -75,11 +128,57 @@ const fetchWeatherData = async () => {
     }
 }
 
+const fetchWeatherWarningsData = async () => {
+    try {
+        const data = (await fetch('https://www.jma.go.jp/bosai/warning/data/warning/' + areaId[location.value] + '.json')).json();
+        return {
+            'success': 'true',
+            'body': await data
+        }
+    } catch {
+        return {
+            'success': 'false'
+        }
+    }
+}
+
 const setWeatherData = async () => {
     weatherData.value = await fetchWeatherData();
     if (weatherData.value['success'] === 'true') {
         forecasts.value = weatherData.value['body']['forecasts'];
     }
+}
+
+const setWeatherWarningsData = async () => {
+    weatherWarningsData.value = await fetchWeatherWarningsData();
+    if (weatherWarningsData.value['success'] === 'true') {
+        advisoryList.value = []
+        warningList.value = []
+        emergencyWarningList.value = []
+        const areas = weatherWarningsData.value['body']['areaTypes'][0]['areas']
+        for (const area of areas) {
+            if (area['code'] == locationId[location.value]) {
+                for (const warning of area['warnings']) {
+                    if (warning['status'] == '発表' || warning['status'] == '継続') {
+                        const warningStr: string = weatherWarnings[warning['code']]
+                        if (warningStr.includes("特別警報")) {
+                            emergencyWarningList.value.push(warningStr.slice(0, -4))
+                        } else if (warningStr.includes("警報")) {
+                            warningList.value.push(warningStr.slice(0, -2))
+                        } else if (warningStr.includes("注意報")) {
+                            advisoryList.value.push(warningStr.slice(0, -3))
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+const reload = async () => {
+    setWeatherData();
+    setWeatherWarningsData();
 }
 
 const setSunData = () => {
@@ -103,12 +202,17 @@ export default {
             sunriseTime,
             sunsetTime,
             location,
+            advisoryList,
+            warningList,
+            emergencyWarningList,
             setWeatherData,
+            reload
         }
     },
 
     async beforeRouteEnter() {
         await setWeatherData();
+        await setWeatherWarningsData();
         store.loading = 'false';
     },
 
@@ -125,6 +229,7 @@ export default {
         location() {
             setWeatherData();
             setSunData();
+            setWeatherWarningsData();
         }
     }
 }
@@ -135,7 +240,7 @@ export default {
     <div class="content">
         <div v-if="weatherData['success'] === 'false'">
             <p>データ取得に失敗しました。</p>
-            <button class="btn-default btn-small" @click="setWeatherData">
+            <button class="btn-default btn-small" @click="reload">
                 <v-icon :icon="mdiReload" size=20 color="rgb(95, 95, 95)"></v-icon>
                 Reload
             </button>
@@ -160,7 +265,7 @@ export default {
                         <option value="Yonaguni">与那国島</option>
                     </select>
                 </div>
-                <button class="btn-default btn-small" @click="setWeatherData">
+                <button class="btn-default btn-small" @click="reload">
                     <v-icon :icon="mdiReload" size=20 color="rgb(95, 95, 95)"></v-icon>
                     Reload
                 </button>
@@ -173,7 +278,8 @@ export default {
                         :max-temperature="forecasts[0]['temperature']['max']['celsius']"
                         :wind="forecasts[0]['detail']['wind']" :wave="forecasts[0]['detail']['wave']"
                         :sunrise-time="sunriseTime" :sunset-time="sunsetTime"
-                        :chance-of-rain="forecasts[0]['chanceOfRain']" />
+                        :chance-of-rain="forecasts[0]['chanceOfRain']" :advisory-list="advisoryList"
+                        :warning-list="warningList" :emergency-warning-list="emergencyWarningList" />
                 </div>
                 <div class="weather-right">
                     <WeatherCard v-for="n in 2" :date="forecasts[n]['date']" :telop="forecasts[n]['telop']"

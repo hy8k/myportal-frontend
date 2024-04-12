@@ -192,6 +192,7 @@ h2 {
     padding: 20px;
     margin-bottom: 5px;
     display: flex;
+    height: 20vw;
 }
 
 .weather-card-left {

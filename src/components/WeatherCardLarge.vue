@@ -3,19 +3,13 @@ import { ref, type Ref } from 'vue';
 import {
     mdiWeatherSunny,
     mdiWeatherCloudy,
-    mdiUmbrellaOutline,
     mdiHelpCircleOutline,
     mdiArrowRightThin,
-    mdiWeatherSunsetUp,
-    mdiWeatherSunsetDown,
-    mdiWeatherCloudyAlert,
-    mdiUmbrellaClosedVariant,
     mdiWeatherSnowyHeavy,
     mdiWeatherSnowyRainy,
     mdiWeatherRainy,
     mdiWeatherSnowy,
     mdiWeatherPouring,
-    mdiWeatherWindy
 } from '@mdi/js';
 import { onBeforeUpdate } from 'vue';
 type RegexDict = { [key: string]: RegExp };
@@ -31,7 +25,10 @@ const props = defineProps<{
     wind: string,
     wave: string | null,
     sunriseTime: string,
-    sunsetTime: string
+    sunsetTime: string,
+    advisoryList: Array<string>,
+    warningList: Array<string>,
+    emergencyWarningList: Array<string>
 }>();
 
 const iconLeft = ref();
@@ -159,20 +156,58 @@ onBeforeUpdate(() => {
                 <p>{{ props.telop }}</p>
             </div>
             <div class="weather-mark-right">
-                <div class="sun-info">
-                    <v-icon :icon="mdiWeatherSunsetUp" size=90 color="rgb(95, 95, 95)"></v-icon>
-                    <p>{{ props.sunriseTime }}</p>
-                </div>
-                <div class="sun-info">
-                    <v-icon :icon="mdiWeatherSunsetDown" size=90 color="rgb(95, 95, 95)"></v-icon>
-                    <p>{{ props.sunsetTime }}</p>
-                </div>
-
+                <h3>発令中の注意報・警報</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td width="80" height="50">注意報</td>
+                            <td>
+                                <div v-if="advisoryList.length != 0" class="jma-list">
+                                    <div v-for="advisory in advisoryList"
+                                        class="jma-weather-warnings-label jma-advisory">
+                                        <p>{{ advisory }}</p>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <p>発令なし</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="50">警報</td>
+                            <td>
+                                <div v-if="warningList.length != 0" class="jma-list">
+                                    <div v-for="warning in warningList" class="jma-weather-warnings-label jma-warning">
+                                        <p>{{ warning }}</p>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <p>発令なし</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="50">特別警報</td>
+                            <td>
+                                <div v-if="emergencyWarningList.length != 0" class="jma-list">
+                                    <div v-for="emergencyWarning in emergencyWarningList"
+                                        class="jma-weather-warnings-label jma-emergency-warning">
+                                        <p>{{ emergencyWarning }}</p>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <p>発令なし</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="weather-info">
             <div class="weather-details">
                 <div class="weather-details-left">
+                    <h3>詳細情報</h3>
                     <table>
                         <tbody>
                             <tr>
@@ -204,12 +239,8 @@ onBeforeUpdate(() => {
                     </table>
                 </div>
                 <div class="weather-details-right" v-if="props.chanceOfRain">
+                    <h3>降水確率</h3>
                     <table>
-                        <thead>
-                            <tr>
-                                <th colspan="2">降水確率</th>
-                            </tr>
-                        </thead>
                         <tbody>
 
                             <tr>
@@ -254,7 +285,7 @@ onBeforeUpdate(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .weather-mark-left {
@@ -265,7 +296,37 @@ onBeforeUpdate(() => {
 .weather-mark-right {
     flex: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
+}
+
+.jma-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.jma-weather-warnings-label {
+    padding: 2px 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin: 0 2px;
+    width: 60px;
+    margin-bottom: 2px;
+}
+
+.jma-advisory {
+    background-color: yellow;
+}
+
+.jma-warning {
+    background-color: rgb(255, 0, 0);
+    color: white;
+}
+
+.jma-emergency-warning {
+    background-color: rgb(195, 0, 255);
+    color: white;
 }
 
 .sun-info {
@@ -289,7 +350,6 @@ onBeforeUpdate(() => {
 .weather-details-left {
     flex: 3;
     padding: 15px;
-    border-radius: 10px;
 }
 
 .weather-details-right {
