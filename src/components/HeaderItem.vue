@@ -11,7 +11,7 @@ defineProps<{
 <template>
     <router-link :to="{name: routerName}">
         <div class="header-item">
-            <v-icon :icon=icon></v-icon>
+            <v-icon :icon=icon color="white"></v-icon>
         </div>
     </router-link>
 </template>

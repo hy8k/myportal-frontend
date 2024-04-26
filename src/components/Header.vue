@@ -5,6 +5,7 @@ import {
     mdiHome,
     mdiPen,
     mdiLoading,
+    mdiFlaskEmpty,
     mdiElectronFramework,
 } from '@mdi/js'
 import { store } from '../store.js';
@@ -13,6 +14,7 @@ import Widget from './Widget.vue';
 const headerItems = ref([
     { name: "Home", icon: mdiHome, routerName: "home" },
     { name: "Memo", icon: mdiPen, routerName: "memo" },
+    { name: "SampleManager", icon: mdiFlaskEmpty, routerName: "laboratoryManagementSystem" },
     // { name: "Article", icon: mdiNewspaper, routerName: "article" },
     // { name: "Editorial", icon: mdiMessageTextOutline, routerName: "editorial" },
 ])
@@ -43,7 +45,7 @@ const { currentTime } = useCurrentTime();
             </div>
         </div>
         <div class="header-right-align">
-            <v-icon v-if="store.loading === 'true'" :icon="mdiLoading" size=30 class="loading-spinner"></v-icon>
+            <v-icon v-if="store.loading === 'true'" :icon="mdiLoading" size=30 class="loading-spinner" color="white"></v-icon>
             <div class="widget-area">
                 <Widget />
             </div>
@@ -57,10 +59,9 @@ const { currentTime } = useCurrentTime();
 <style scoped>
 header {
     display: flex;
-    background-color: rgb(250, 250, 250);
-    color: rgb(95, 95, 95);
+    background-color: rgb(25, 118, 210);
     line-height: 0.5;
-    border-bottom: 1px solid rgb(200, 200, 200);
+    border-bottom: 1px solid rgb(255, 255, 255);
     height: 35px;
 }
 
@@ -76,6 +77,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: right;
+    color: white;
 }
 
 header i {
@@ -91,7 +93,7 @@ header a {
 }
 
 header a:hover {
-    background-color: rgb(235, 235, 235);
+    background-color: rgb(41, 138, 236);
 }
 
 .header-items {
@@ -101,7 +103,7 @@ header a:hover {
 
 header .clock {
     padding: 0 10px;
-    border-left: 1px solid rgb(200, 200, 200);
+    border-left: 1px solid rgb(255, 255, 255);
     font-size: 12px;
     height: 25px;
     text-align: right;
@@ -115,7 +117,7 @@ header .clock {
     /* height: 45px; */
     align-items: center;
     justify-content: center;
-    border-left: 1px solid rgb(200, 200, 200);
+    border-left: 1px solid rgb(255, 255, 255);
 }
 
 .loading-spinner {

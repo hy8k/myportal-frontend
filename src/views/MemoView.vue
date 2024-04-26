@@ -7,7 +7,7 @@ import FileCreateModal from '@/components/FileCreateModal.vue';
 import FileRenameModal from '@/components/FileRenameModal.vue';
 import FileDeleteModal from '@/components/FileDeleteModal.vue';
 import {
-    mdiPlusCircle,
+    mdiPlus,
     mdiNoteEdit,
     mdiRename,
     mdiDelete,
@@ -170,7 +170,7 @@ export default {
             isMarkDownActivated,
             isRenameActivated,
             notificationMessage,
-            mdiPlusCircle,
+            mdiPlus,
             mdiNoteEdit,
             mdiRename,
             mdiDelete,
@@ -187,35 +187,53 @@ export default {
     },
 
     async beforeRouteEnter() {
-        memoInfo.value = await fetchMemo();
-        store.loading = 'false';
-
-        isMarkDownActivated.value = false;
-    },
-
-    beforeRouteLeave() {
         store.loading = 'pending';
         setTimeout(() => {
             if (store.loading === 'pending') {
                 store.loading = 'true';
             }
         }, 1000);
-    }
+        memoInfo.value = await fetchMemo();
+        store.loading = 'false';
+        isMarkDownActivated.value = false;
+    },
+
+    // beforeRouteLeave() {
+    //     store.loading = 'pending';
+    //     setTimeout(() => {
+    //         if (store.loading === 'pending') {
+    //             store.loading = 'true';
+    //         }
+    //     }, 1000);
+    // }
 }
 </script>
 
 <template>
     <div class="main-wrapper">
         <div class="side-bar">
-            <a v-for="(memoData, memoTitle) in memoInfo['memoList']" class="side-bar-item"
-                @click="changeMarkdownContent(memoTitle)">{{ memoTitle }}
-            </a>
-            <a class="side-bar-item add-memo-btn" @click="showMemoCreateModal = true">
-                <v-icon :icon="mdiPlusCircle" size=20></v-icon>
-            </a>
+            <div class="side-bar-header">
+                <div class="side-bar-header-left">
+                    メモ
+                </div>
+                <div class="side-bar-header-right">
+                    <button class="btn-default btn-small" @click="showMemoCreateModal = true">
+                        <v-icon :icon="mdiPlus" size=20 color="rgb(95, 95, 95)"></v-icon>
+                    </button>
+                </div>
+            </div>
+
+            <div class="side-bar-content">
+                <a v-for="(memoData, memoTitle) in memoInfo['memoList']" class="side-bar-item"
+                    @click="changeMarkdownContent(memoTitle)">{{ memoTitle }}
+                </a>
+                <!-- <a class="side-bar-item add-memo-btn" @click="showMemoCreateModal = true">
+                    <v-icon :icon="mdiPlus" size=20></v-icon>
+                </a> -->
+            </div>
         </div>
         <div v-if="!isMarkDownActivated" class="markdown-default">
-            <v-icon :icon="mdiNoteEdit" size=40></v-icon>
+            <v-icon :icon="mdiNoteEdit" size=40 color="rgb(174, 174, 174)"></v-icon>
         </div>
         <div class="main-content" v-else>
             <div class="markdown-menu">
@@ -243,8 +261,8 @@ export default {
                 <MilkdownProvider>
                     <ProsemirrorAdapterProvider>
                         <MilkdownEditor @update="(e: Dict) => saveMemo(e['memoTitle'], e['markdownText'])" @rename="(e: Dict) => {
-                            renameMemo(e['oldMemoTitle'], e['newMemoTitle'], e['markdownText']);
-                        }" :initial-memo-title="initialMemoTitle" :initial-markdown-text="initialMarkdownText"
+                        renameMemo(e['oldMemoTitle'], e['newMemoTitle'], e['markdownText']);
+                    }" :initial-memo-title="initialMemoTitle" :initial-markdown-text="initialMarkdownText"
                             :is-rename-activated="isRenameActivated" />
                     </ProsemirrorAdapterProvider>
                 </MilkdownProvider>
@@ -253,21 +271,21 @@ export default {
     </div>
     <Teleport to="body">
         <FileCreateModal :show="showMemoCreateModal" @close="showMemoCreateModal = false" @create="(memoTitle: string) => {
-            saveMemo(memoTitle, '');
-            showMemoCreateModal = false;
-        }">
+                        saveMemo(memoTitle, '');
+                        showMemoCreateModal = false;
+                    }">
         </FileCreateModal>
         <FileRenameModal :show="showMemoRenameModal" @close="showMemoRenameModal = false" @rename="(newMemoTitle: string) => {
-            isRenameActivated = true;
-            initialMemoTitle = newMemoTitle;
-            showMemoRenameModal = false;
-        }">
+                        isRenameActivated = true;
+                        initialMemoTitle = newMemoTitle;
+                        showMemoRenameModal = false;
+                    }">
         </FileRenameModal>
         <FileDeleteModal :show="showMemoDeleteModal" @close="showMemoDeleteModal = false" @delete="() => {
-            isMarkDownActivated = false;
-            deleteMemo();
-            showMemoDeleteModal = false;
-        }">
+                        isMarkDownActivated = false;
+                        deleteMemo();
+                        showMemoDeleteModal = false;
+                    }">
         </FileDeleteModal>
     </Teleport>
 </template>
@@ -280,16 +298,28 @@ export default {
 }
 
 .side-bar {
-    width: 13vw;
-    background-color: rgb(250, 250, 250);
+    width: 15vw;
+    background-color: rgb(245, 245, 245);
     height: calc(100vh - 35px);
     flex-flow: column;
+    border-right: 1px solid rgb(255, 255, 255);
+}
+
+.side-bar-content {
     overflow-y: scroll;
-    border-right: 1px solid rgb(200, 200, 200);
+    height: calc(100vh - 75px);
 }
 
 .side-bar::-webkit-scrollbar {
     display: none;
+}
+
+.side-bar-header {
+    background-color: rgb(0, 86, 173);
+    color: white;
+    height: 40px;
+    display: flex;
+    align-items: center;
 }
 
 .side-bar-item {
@@ -300,8 +330,24 @@ export default {
     font-size: 12px;
 }
 
+.side-bar-header-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+}
+
+.side-bar-header-right {
+    flex: 1;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 15px;
+}
+
 .side-bar-item:hover {
-    background-color: rgb(235, 235, 235);
+    background-color: rgb(180, 225, 235);
 }
 
 
@@ -311,7 +357,7 @@ export default {
 }
 
 .main-content {
-    width: 87vw;
+    width: 85vw;
 }
 
 .markdown-menu {
@@ -319,7 +365,7 @@ export default {
     height: 40px;
     padding: 0 15px;
     color: white;
-    background-color: rgb(95, 95, 95);
+    background-color: rgb(0, 86, 173);
 }
 
 .markdown-menu button {

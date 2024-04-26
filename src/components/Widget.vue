@@ -131,7 +131,7 @@ setInterval(() => {
 
 <template>
     <div class="widget-wrapper appear">
-        <v-icon class="widget-icon" :icon="iconAndMessageList[cursor]['icon']" size=25 color="rgb(95, 95, 95)"></v-icon>
+        <v-icon class="widget-icon" :icon="iconAndMessageList[cursor]['icon']" size=25 color="white"></v-icon>
         <p class="widget-string">{{ iconAndMessageList[cursor]['message'] }}</p>
     </div>
 </template>
@@ -141,6 +141,7 @@ setInterval(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: white;
 }
 
 .widget-wrapper p {

@@ -4,6 +4,8 @@ import {
     mdiWeatherSunny,
     mdiWeatherCloudy,
     mdiHelpCircleOutline,
+    mdiWeatherSunsetUp,
+    mdiWeatherSunsetDown,
     mdiArrowRightThin,
     mdiWeatherSnowyHeavy,
     mdiWeatherSnowyRainy,
@@ -144,9 +146,9 @@ onBeforeUpdate(() => {
 
 <template>
     <div class="weather-card">
-        <h3><b>{{ formatDateToJapanese(props.date as string) }}</b></h3>
         <div class="weather-mark-wrapper">
             <div class="weather-mark-left">
+                <h3><b>{{ formatDateToJapanese(props.date as string) }}</b></h3>
                 <div class="weather-mark">
                     <v-icon :icon="iconLeft" size=130 color="rgb(95, 95, 95)"></v-icon>
                     <v-icon class="icon-mid" v-if="iconMid !== undefined" :icon="iconMid" size=40
@@ -156,52 +158,39 @@ onBeforeUpdate(() => {
                 <p>{{ props.telop }}</p>
             </div>
             <div class="weather-mark-right">
-                <h3>発令中の注意報・警報</h3>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td width="80" height="50">注意報</td>
-                            <td>
-                                <div v-if="advisoryList.length != 0" class="jma-list">
-                                    <div v-for="advisory in advisoryList"
-                                        class="jma-weather-warnings-label jma-advisory">
-                                        <p>{{ advisory }}</p>
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <p>発令なし</p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td height="50">警報</td>
-                            <td>
-                                <div v-if="warningList.length != 0" class="jma-list">
-                                    <div v-for="warning in warningList" class="jma-weather-warnings-label jma-warning">
-                                        <p>{{ warning }}</p>
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <p>発令なし</p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td height="50">特別警報</td>
-                            <td>
-                                <div v-if="emergencyWarningList.length != 0" class="jma-list">
-                                    <div v-for="emergencyWarning in emergencyWarningList"
-                                        class="jma-weather-warnings-label jma-emergency-warning">
-                                        <p>{{ emergencyWarning }}</p>
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <p>発令なし</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <h3>日の出・日没時刻</h3>
+                <div class="sun">
+                    <div class="sun-info">
+                        <v-icon :icon="mdiWeatherSunsetUp" size=60></v-icon>
+                        <p>{{ props.sunriseTime }}</p>
+                    </div>
+                    <div class="sun-info">
+                        <v-icon :icon="mdiWeatherSunsetDown" size=60></v-icon>
+                        <p>{{ props.sunsetTime }}</p>
+                    </div>
+                </div>
+                <div class="jma-weather-warnings">
+                    <h3>発令中の注意報・警報</h3>
+                    <div v-if="advisoryList.length == 0 && warningList.length == 0 && emergencyWarningList.length == 0">
+                        <p>なし</p>
+                    </div>
+                    <div v-if="advisoryList.length != 0" class="jma-list">
+                        <div v-for="advisory in advisoryList" class="jma-weather-warnings-label jma-advisory">
+                            <p>{{ advisory }}</p>
+                        </div>
+                    </div>
+                    <div v-if="warningList.length != 0" class="jma-list">
+                        <div v-for="warning in warningList" class="jma-weather-warnings-label jma-warning">
+                            <p>{{ warning }}</p>
+                        </div>
+                    </div>
+                    <div v-if="emergencyWarningList.length != 0" class="jma-list">
+                        <div v-for="emergencyWarning in emergencyWarningList"
+                            class="jma-weather-warnings-label jma-emergency-warning">
+                            <p>{{ emergencyWarning }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="weather-info">
@@ -244,11 +233,11 @@ onBeforeUpdate(() => {
                         <tbody>
 
                             <tr>
-                                <td width="130">0:00-6:00</td>
+                                <td width="130">00:00-06:00</td>
                                 <td>{{ props.chanceOfRain['T00_06'] }}</td>
                             </tr>
                             <tr>
-                                <td>6:00-12:00</td>
+                                <td>06:00-12:00</td>
                                 <td>{{ props.chanceOfRain['T06_12'] }}</td>
                             </tr>
                             <tr>
@@ -284,34 +273,37 @@ onBeforeUpdate(() => {
 .weather-mark-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
     margin-bottom: 15px;
 }
 
 .weather-mark-left {
-    text-align: center;
     flex: 1;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.weather-mark-left>p {
+    text-align: center
 }
 
 .weather-mark-right {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
+
+.jma-weather-warnings {}
 
 .jma-list {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
 }
 
 .jma-weather-warnings-label {
     padding: 2px 5px;
-    border: 1px solid black;
+    border: 1px solid rgb(200, 200, 200);
     border-radius: 5px;
     margin: 0 2px;
-    width: 60px;
     margin-bottom: 2px;
 }
 
@@ -327,6 +319,11 @@ onBeforeUpdate(() => {
 .jma-emergency-warning {
     background-color: rgb(195, 0, 255);
     color: white;
+}
+
+.sun {
+    display: flex;
+    margin-bottom: 10px;
 }
 
 .sun-info {
@@ -357,14 +354,12 @@ onBeforeUpdate(() => {
     padding: 15px;
 }
 
-table {
-    width: 100%;
-}
-
 .weather-mark {
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    color: rgba(0, 0, 0, 0.87);
+
 }
 
 .icon-mid {

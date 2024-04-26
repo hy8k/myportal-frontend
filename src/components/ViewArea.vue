@@ -11,7 +11,6 @@ import { RouterView } from 'vue-router';
 <style scoped>
 .main-area {
     white-space: pre-wrap;
-    color: rgb(95, 95, 95);
     height: calc(100vh - 35px);
 }
 </style>

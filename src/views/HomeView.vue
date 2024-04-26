@@ -3,10 +3,11 @@ import { ref } from 'vue'
 import { store } from '@/store';
 import WeatherCard from '@/components/WeatherCard.vue';
 import WeatherCardLarge from '@/components/WeatherCardLarge.vue';
-import { mdiReload } from '@mdi/js';
+import { mdiReload, mdiStoreAlert, mdiLoading } from '@mdi/js';
 import SunCalc from 'suncalc';
 type Dict = { [key: string]: any };
 
+const loading = ref(false);
 const weatherData = ref();
 const forecasts = ref();
 const weatherWarningsData = ref();
@@ -117,13 +118,13 @@ const fetchWeatherData = async () => {
     try {
         const data = (await fetch('https://weather.tsukumijima.net/api/forecast/city/' + locationId[location.value])).json();
         return {
-            'success': 'true',
+            'success': true,
             'body': await data
         }
 
     } catch {
         return {
-            'success': 'false'
+            'success': false
         }
     }
 }
@@ -132,26 +133,26 @@ const fetchWeatherWarningsData = async () => {
     try {
         const data = (await fetch('https://www.jma.go.jp/bosai/warning/data/warning/' + areaId[location.value] + '.json')).json();
         return {
-            'success': 'true',
+            'success': true,
             'body': await data
         }
     } catch {
         return {
-            'success': 'false'
+            'success': false
         }
     }
 }
 
-const setWeatherData = async () => {
-    weatherData.value = await fetchWeatherData();
-    if (weatherData.value['success'] === 'true') {
+const setWeatherData = (latestWeatherData: Dict) => {
+    weatherData.value = latestWeatherData;
+    if (weatherData.value['success'] === true) {
         forecasts.value = weatherData.value['body']['forecasts'];
     }
 }
 
-const setWeatherWarningsData = async () => {
-    weatherWarningsData.value = await fetchWeatherWarningsData();
-    if (weatherWarningsData.value['success'] === 'true') {
+const setWeatherWarningsData = (latestWeatherWarningsData: Dict) => {
+    weatherWarningsData.value = latestWeatherWarningsData
+    if (weatherWarningsData.value['success'] === true) {
         advisoryList.value = []
         warningList.value = []
         emergencyWarningList.value = []
@@ -162,11 +163,11 @@ const setWeatherWarningsData = async () => {
                     if (warning['status'] == '発表' || warning['status'] == '継続') {
                         const warningStr: string = weatherWarnings[warning['code']]
                         if (warningStr.includes("特別警報")) {
-                            emergencyWarningList.value.push(warningStr.slice(0, -4))
+                            emergencyWarningList.value.push(warningStr)
                         } else if (warningStr.includes("警報")) {
-                            warningList.value.push(warningStr.slice(0, -2))
+                            warningList.value.push(warningStr)
                         } else if (warningStr.includes("注意報")) {
-                            advisoryList.value.push(warningStr.slice(0, -3))
+                            advisoryList.value.push(warningStr)
 
                         }
                     }
@@ -176,15 +177,21 @@ const setWeatherWarningsData = async () => {
     }
 }
 
-const reload = async () => {
-    setWeatherData();
-    setWeatherWarningsData();
-}
 
 const setSunData = () => {
     sunCalcList.value = SunCalc.getTimes(new Date(), locationLatitude[location.value], locationLongitude[location.value]);
     sunriseTime.value = sunCalcList.value.sunrise.getHours().toString() + ':' + ('0' + sunCalcList.value.sunrise.getMinutes().toString()).slice(-2);
     sunsetTime.value = sunCalcList.value.sunset.getHours().toString() + ':' + ('0' + sunCalcList.value.sunset.getMinutes().toString()).slice(-2);
+}
+
+const setAllData = async () => {
+    loading.value = true;
+    const weather = await fetchWeatherData();
+    const weatherWarnings = await fetchWeatherWarningsData();
+    setWeatherData(weather);
+    setWeatherWarningsData(weatherWarnings);
+    setSunData();
+    loading.value = false;
 }
 
 export default {
@@ -198,6 +205,7 @@ export default {
             weatherData,
             forecasts,
             mdiReload,
+            mdiLoading,
             sunCalcList,
             sunriseTime,
             sunsetTime,
@@ -205,31 +213,35 @@ export default {
             advisoryList,
             warningList,
             emergencyWarningList,
+            loading,
             setWeatherData,
-            reload
+            setAllData
         }
     },
 
     async beforeRouteEnter() {
-        await setWeatherData();
-        await setWeatherWarningsData();
-        store.loading = 'false';
-    },
-
-    beforeRouteLeave() {
         store.loading = 'pending';
         setTimeout(() => {
             if (store.loading === 'pending') {
                 store.loading = 'true';
             }
         }, 1000);
+        await setAllData();
+        store.loading = 'false';
     },
+
+    // beforeRouteLeave() {
+    //     store.loading = 'pending';
+    //     setTimeout(() => {
+    //         if (store.loading === 'pending') {
+    //             store.loading = 'true';
+    //         }
+    //     }, 1000);
+    // },
 
     watch: {
         location() {
-            setWeatherData();
-            setSunData();
-            setWeatherWarningsData();
+            setAllData()
         }
     }
 }
@@ -238,38 +250,36 @@ export default {
 
 <template>
     <div class="content">
-        <div v-if="weatherData['success'] === 'false'">
-            <p>データ取得に失敗しました。</p>
-            <button class="btn-default btn-small" @click="reload">
+        <div class="weather-header">
+            <h2>3日間天気予報</h2>
+            <div class="selectbox">
+                <select v-model="location">
+                    <option value="Sapporo">札幌</option>
+                    <option value="Wakkanai">稚内</option>
+                    <option value="Sendai">仙台</option>
+                    <option value="Niigata">新潟</option>
+                    <option value="Kumagaya">熊谷</option>
+                    <option value="Tokyo">東京</option>
+                    <option value="Hachijojima">八丈島</option>
+                    <option value="Chiba">千葉</option>
+                    <option value="Nagoya">名古屋</option>
+                    <option value="Kyoto">京都</option>
+                    <option value="Fukuoka">福岡</option>
+                    <option value="Naha">那覇</option>
+                    <option value="Yonaguni">与那国島</option>
+                </select>
+            </div>
+            <button class="btn-default btn-small" @click="setAllData">
                 <v-icon :icon="mdiReload" size=20 color="rgb(95, 95, 95)"></v-icon>
                 Reload
             </button>
+            <v-icon v-if="loading === true" :icon="mdiLoading" size=30 class="loading-spinner"></v-icon>
+
+        </div>
+        <div v-if="weatherData['success'] === false">
+            <p>データ取得に失敗しました。</p>
         </div>
         <div v-else>
-            <div class="weather-header">
-                <h2>3日間天気予報</h2>
-                <div class="selectbox">
-                    <select v-model="location">
-                        <option value="Sapporo">札幌</option>
-                        <option value="Wakkanai">稚内</option>
-                        <option value="Sendai">仙台</option>
-                        <option value="Niigata">新潟</option>
-                        <option value="Kumagaya">熊谷</option>
-                        <option value="Tokyo">東京</option>
-                        <option value="Hachijojima">八丈島</option>
-                        <option value="Chiba">千葉</option>
-                        <option value="Nagoya">名古屋</option>
-                        <option value="Kyoto">京都</option>
-                        <option value="Fukuoka">福岡</option>
-                        <option value="Naha">那覇</option>
-                        <option value="Yonaguni">与那国島</option>
-                    </select>
-                </div>
-                <button class="btn-default btn-small" @click="reload">
-                    <v-icon :icon="mdiReload" size=20 color="rgb(95, 95, 95)"></v-icon>
-                    Reload
-                </button>
-            </div>
             <div class="weather">
                 <div class="weather-left">
                     <WeatherCardLarge :date="forecasts[0]['date']" :telop="forecasts[0]['telop']"
@@ -340,5 +350,20 @@ h2 {
 
 .description p {
     padding: 10px;
+}
+
+.loading-spinner {
+    animation: rotate linear 0.4s infinite;
+    margin-left: 10px;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>

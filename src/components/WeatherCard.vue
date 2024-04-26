@@ -192,7 +192,6 @@ h2 {
     padding: 20px;
     margin-bottom: 5px;
     display: flex;
-    height: 20vw;
 }
 
 .weather-card-left {
@@ -225,20 +224,18 @@ h2 {
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    color: rgba(0, 0, 0, 0.87);
+
 }
 
 .weather-details {
-    padding: 20px;
-    border-radius: 10px;
+    border-radius: 4px;
 }
 
 .icon-mid {
     margin-left: -20px;
     margin-right: -10px;
-}
-
-table {
-    width: 100%;
+    margin-bottom: -5px;
 }
 
 .weather-card+h2 {
