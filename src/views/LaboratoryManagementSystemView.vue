@@ -49,14 +49,17 @@ export default {
 <template>
     <div class="main-wrapper">
         <div class="side-bar">
-            <div class="side-bar-item" @click="setCurrentContent('compound')">
-                <v-icon :icon=mdiMolecule size="30"></v-icon>
+            <div class="side-bar-item compound-manager-btn" @click="setCurrentContent('compound')">
+                <!-- <v-icon :icon=mdiMolecule size="30" color="rgb(120, 120, 120)"></v-icon> -->
+                化 合 物 管 理
             </div>
-            <div class="side-bar-item" @click="setCurrentContent('experiment')">
-                <v-icon :icon=mdiTestTube size="30"></v-icon>
+            <div class="side-bar-item experiment-manager-btn" @click="setCurrentContent('experiment')">
+                <!-- <v-icon :icon=mdiTestTube size="30" color="rgb(120, 120, 120)"></v-icon> -->
+                実 験 管 理
             </div>
-            <div class="side-bar-item" @click="setCurrentContent('sample')">
-                <v-icon :icon=mdiBottleTonic size="30"></v-icon>
+            <div class="side-bar-item sample-manager-btn" @click="setCurrentContent('sample')">
+                <!-- <v-icon :icon=mdiBottleTonic size="30" color="rgb(120, 120, 120)"></v-icon> -->
+                サ ン プ ル 管 理
             </div>
         </div>
         <div class="main-content">
@@ -82,12 +85,13 @@ export default {
 
 .side-bar {
     display: flex;
-    width: 3.5vw;
-    background-color: rgb(205, 233, 251);
+    width: 2.5vw;
     height: calc(100vh - 35px);
     flex-flow: column;
     overflow-y: scroll;
-    border-right: 1px solid rgb(200, 200, 200);
+    border-right: 1px solid rgb(200,200,200);
+    border-bottom: 1px solid rgb(200,200,200);
+    /* border-right: 1px solid white; */
 }
 
 .side-bar::-webkit-scrollbar {
@@ -95,6 +99,7 @@ export default {
 }
 
 .side-bar-item {
+    writing-mode: vertical-rl;
     display: flex;
     cursor: pointer;
     font-size: 12px;
@@ -102,11 +107,25 @@ export default {
     align-items: center;
     padding: 5px;
     flex: 1;
-    border-bottom: 1px solid rgb(200, 200, 200);
+    /* background-color: rgb(41, 138, 236); */
+
 }
 
 .side-bar-item:hover {
     background-color: rgb(180, 225, 235);
+}
+
+.compound-manager-btn {
+    background-color: #ffdfdf;
+}
+
+.experiment-manager-btn {
+    background-color: #faffdf;
+
+}
+
+.sample-manager-btn {
+    background-color: #dfffee;
 }
 
 .main-content {

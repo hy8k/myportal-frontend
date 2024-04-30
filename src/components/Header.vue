@@ -61,7 +61,7 @@ header {
     display: flex;
     background-color: rgb(25, 118, 210);
     line-height: 0.5;
-    border-bottom: 1px solid rgb(255, 255, 255);
+    /* border-bottom: 1px solid rgb(255, 255, 255); */
     height: 35px;
 }
 

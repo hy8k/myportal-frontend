@@ -7,7 +7,9 @@ import {
     mdiPlus,
     mdiSleep
 } from '@mdi/js'
+import InsertCompoundModal from '@/components/InsertCompoundModal.vue';
 
+const showInsertCompoundModal = ref(false);
 const currentMode = ref("");
 const compoundsList = ref();
 const experiemntList1 = ref();
@@ -124,7 +126,8 @@ onMounted(() => {
                 </div>
                 <div class="cm-header-right">
                     <button class="btn-default btn-small">
-                        <v-icon :icon="mdiPlus" size=20 color="rgb(95, 95, 95)"></v-icon>
+                        <v-icon @click="showInsertCompoundModal = true" :icon="mdiPlus" size=20
+                            color="rgb(95, 95, 95)"></v-icon>
                     </button>
                 </div>
             </div>
@@ -231,18 +234,25 @@ onMounted(() => {
             </div>
         </div>
     </div>
+    <Teleport to="body">
+        <InsertCompoundModal :show="showInsertCompoundModal" @close="showInsertCompoundModal = false" @create="(memoTitle: string) => {
+                            // saveMemo(memoTitle, '');
+                            showInsertCompoundModal = false;
+                        }">
+        </InsertCompoundModal>
+    </Teleport>
 </template>
 
 <style scoped>
 .main-area {
     display: flex;
-    width: 96.5vw;
+    width: 97.5vw;
 }
 
 .cm-side-bar {
     width: 30vw;
     height: calc(100vh - 35px);
-    border-right: 2px solid rgb(200, 200, 200);
+    border-right: 1px solid white;
 
 }
 
@@ -251,7 +261,7 @@ onMounted(() => {
     height: 40px;
     padding: 0 15px;
     color: white;
-    background-color: rgb(0, 86, 173);
+    background-color: rgb(199, 50, 50);
 }
 
 .cm-header-left {
@@ -294,7 +304,7 @@ onMounted(() => {
 }
 
 .cm-main-content {
-    width: 66.5vw;
+    width: 67.5vw;
 }
 
 .cm-main-content-default {
@@ -351,7 +361,7 @@ onMounted(() => {
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px
 }
 
-.cm-table-area> h2 {
+.cm-table-area>h2 {
     padding: 10px;
 }
 

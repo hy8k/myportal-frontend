@@ -8,7 +8,9 @@ import {
     mdiPlus,
     mdiMagnify
 } from '@mdi/js'
+import InsertSampleModal from '@/components/InsertSampleModal.vue';
 
+const showInsertSampleModal = ref(false);
 const currentMode = ref("");
 const samplesList = ref();
 const currentSampleDetails = ref()
@@ -65,7 +67,8 @@ onMounted(() => {
                         <v-icon :icon="mdiMagnify" size=20 color="rgb(95, 95, 95)"></v-icon>
                     </button>
                     <button class="btn-default btn-small">
-                        <v-icon :icon="mdiPlus" size=20 color="rgb(95, 95, 95)"></v-icon>
+                        <v-icon @click="showInsertSampleModal = true" :icon="mdiPlus" size=20
+                            color="rgb(95, 95, 95)"></v-icon>
                     </button>
                 </div>
             </div>
@@ -121,6 +124,13 @@ onMounted(() => {
             </div>
         </div>
     </div>
+    <Teleport to="body">
+        <InsertSampleModal :show="showInsertSampleModal" @close="showInsertSampleModal = false" @create="(memoTitle: string) => {
+                            // saveMemo(memoTitle, '');
+                            showInsertSampleModal = false;
+                        }">
+        </InsertSampleModal>
+    </Teleport>
 </template>
 
 <style scoped>
@@ -141,7 +151,7 @@ onMounted(() => {
     height: 40px;
     padding: 0 15px;
     color: white;
-    background-color: rgb(95, 95, 95);
+    background-color: rgb(37, 154, 66);
 }
 
 .sm-header-left {

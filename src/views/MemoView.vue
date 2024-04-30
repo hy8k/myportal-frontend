@@ -299,7 +299,6 @@ export default {
 
 .side-bar {
     width: 15vw;
-    background-color: rgb(245, 245, 245);
     height: calc(100vh - 35px);
     flex-flow: column;
     border-right: 1px solid rgb(255, 255, 255);
