@@ -136,14 +136,13 @@ onMounted(() => {
 <style scoped>
 .main-area {
     display: flex;
-    width: 96.5vw;
+    width: 97.5vw;
 }
 
 .sm-side-bar {
     width: 30vw;
     height: calc(100vh - 35px);
-    border-right: 2px solid rgb(200, 200, 200);
-
+    border-right: 1px solid rgb(200, 200, 200);
 }
 
 .sm-header {
@@ -191,7 +190,7 @@ onMounted(() => {
 }
 
 .sm-main-content {
-    width: 66.5vw;
+    width: 67.5vw;
 }
 
 .sm-main-content-default {

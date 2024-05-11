@@ -141,13 +141,13 @@ onMounted(() => {
 <style scoped>
 .main-area {
     display: flex;
-    width: 96.5vw;
+    width: 97.5vw;
 }
 
 .em-side-bar {
     width: 30vw;
     height: calc(100vh - 35px);
-    border-right: 2px solid rgb(200, 200, 200);
+    border-right: 1px solid rgb(200, 200, 200);
 
 }
 
@@ -196,7 +196,7 @@ onMounted(() => {
 }
 
 .em-main-content {
-    width: 66.5vw;
+    width: 67.5vw;
 }
 
 .em-main-content-default {
@@ -242,5 +242,7 @@ onMounted(() => {
 
 .em-details-area {
     padding: 20px;
+    overflow-y: scroll;
+    height: calc(100vh - 75px);
 }
 </style>

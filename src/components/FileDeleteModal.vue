@@ -18,8 +18,8 @@ const props = defineProps({
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn-danger modal-default-btn" @click="$emit('delete')">削除する</button>
-                    <button class="btn-default modal-default-btn" @click="$emit('close')">キャンセル</button>
+                    <v-btn class="btn-danger modal-default-btn" @click="$emit('delete')">削除する</v-btn>
+                    <v-btn class="btn-default modal-default-btn" @click="$emit('close')">キャンセル</v-btn>
                 </div>
             </div>
         </div>

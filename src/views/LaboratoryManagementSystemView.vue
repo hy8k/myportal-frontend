@@ -90,7 +90,6 @@ export default {
     flex-flow: column;
     overflow-y: scroll;
     border-right: 1px solid rgb(200,200,200);
-    border-bottom: 1px solid rgb(200,200,200);
     /* border-right: 1px solid white; */
 }
 
@@ -107,6 +106,7 @@ export default {
     align-items: center;
     padding: 5px;
     flex: 1;
+    border-bottom: 1px solid rgb(200,200,200);
     /* background-color: rgb(41, 138, 236); */
 
 }

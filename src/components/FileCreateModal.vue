@@ -15,16 +15,15 @@ const memoTitle = ref();
                 </div>
 
                 <div class="modal-body">
-                    <label for="name">タイトル</label>
-                    <input type="text" v-model="memoTitle">
+                    <v-text-field label="タイトル" v-model="memoTitle"></v-text-field>
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn-primary modal-default-btn" @click="{
+                    <v-btn class="btn-primary modal-default-btn" @click="{
                         $emit('create', memoTitle);
                         memoTitle = '';
-                    }">作成する</button>
-                    <button class="btn-default modal-default-btn" @click="$emit('close')">キャンセル</button>
+                    }">作成する</v-btn>
+                    <v-btn class="btn-default modal-default-btn" @click="$emit('close')">キャンセル</v-btn>
                 </div>
             </div>
         </div>

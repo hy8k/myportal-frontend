@@ -41,7 +41,7 @@ const changeMarkdownContent = (memoTitle: string | number) => {
 }
 
 const fetchMemo = async () => {
-    const memoInfoRaw = await fetch('./getMemo.php');
+    const memoInfoRaw = await fetch('./api_memo/getMemo.php');
     if (!memoInfoRaw.ok) {
         return {
             'memoList': {
@@ -64,7 +64,7 @@ const saveMemo = async (memoTitle: string, markdownText: string) => {
         'markdownText': markdownText
     };
 
-    const response = await fetch('./saveMemo.php', {
+    const response = await fetch('./api_memo/saveMemo.php', {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
@@ -88,7 +88,7 @@ const renameMemo = async (oldMemoTitle: string, newMemoTitle: string, markdownTe
         'markdownText': markdownText
     };
 
-    const response = await fetch('./renameMemo.php', {
+    const response = await fetch('./api_memo/renameMemo.php', {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
@@ -111,7 +111,7 @@ const deleteMemo = async () => {
         'memo_title': initialMemoTitle.value,
     };
 
-    const response = await fetch('./deleteMemo.php', {
+    const response = await fetch('./api_memo/deleteMemo.php', {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
@@ -301,7 +301,7 @@ export default {
     width: 15vw;
     height: calc(100vh - 35px);
     flex-flow: column;
-    border-right: 1px solid rgb(255, 255, 255);
+    border-right: 1px solid rgb(200, 200, 200);
 }
 
 .side-bar-content {

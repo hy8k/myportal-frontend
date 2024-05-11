@@ -2,86 +2,57 @@
 import { onMounted } from 'vue';
 import { ref } from 'vue';
 import {
-    mdiFileQuestion,
     mdiMolecule,
     mdiPlus,
-    mdiSleep
 } from '@mdi/js'
 import InsertCompoundModal from '@/components/InsertCompoundModal.vue';
 
+
 const showInsertCompoundModal = ref(false);
-const currentMode = ref("");
+const isDetailsShown = ref(false);
 const compoundsList = ref();
-const experiemntList1 = ref();
+const experimentsListToSynthesisTargetCompound = ref();
+const samplesListContainCompound = ref();
 const currentCompoundDetails = ref();
 const isLoadingList = ref(false);
+const isLoadingDetails = ref(false);
 const sleep = (second: number) => new Promise(resolve => setTimeout(resolve, second * 1000))
 
-const setCurrentCompoundDetail = async (compoundId: number) => {
+const setCurrentCompoundDetails = async (compoundId: number) => {
+    isLoadingDetails.value = true;
     try {
-        await getCompoundDetails(compoundId);
-        await getExperimentDetails1(compoundId);
-        currentMode.value = 'detail';
+        await getCompoundInfo(compoundId);
+        await getExperimentsListToSynthesisTargetCompound(compoundId);
+        await getSamplesListContainCompound(compoundId);
+        isDetailsShown.value = true;
     } catch (e) {
-        // currentMode.value = 'error';
-        currentMode.value = 'detail';
-        currentCompoundDetails.value = { "compound": [{ "compound_id": 2, "compound_name": "テスト2", "compound_image_url": "..\/res\/images\/compound2.bmp" }], "experiments": [{ "experiment_id": 3, "compound_id": 2, "timestamp": "2024-04-01" }, { "experiment_id": 4, "compound_id": 2, "timestamp": "2024-04-01" }, { "experiment_id": 5, "compound_id": 2, "timestamp": "2024-04-01" }], "samples": [{ "sample_id": 7, "compound_id": 2, "state_id": 1, "current_weight": 2.324, "label": "crude", "timestamp": "2024-04-05" }] }
-        experiemntList1.value = [
-            {
-                "experiment_id": 3,
-                "compound_id": 2,
-                "timestamp": "2024-04-01"
-            },
-            {
-                "experiment_id": 4,
-                "compound_id": 2,
-                "timestamp": "2024-04-01"
-            },
-            {
-                "experiment_id": 5,
-                "compound_id": 2,
-                "timestamp": "2024-04-01"
-            }
-        ]
+        // isDetailsShown.value = 'error';
+        isDetailsShown.value = true;
+        currentCompoundDetails.value = { "error": false, "errorMessage": "", "content": [{ "id": 1, "created_at": "2024-04-01", "updated_at": "2024-04-01", "name": "ベンジリデンアセタール", "image_url": "..\/res\/images\/compound1.bmp", "memo": "" }] };
+        experimentsListToSynthesisTargetCompound.value = { "error": false, "errorMessage": "", "content": [{ "id": 1, "created_at": "2024-04-01", "updated_at": "2024-04-01", "title": "ベンジリデンアセタール化", "compound_id": 1, "implementation_date": "2024-04-01", "memo": "" }, { "id": 2, "created_at": "2024-04-01", "updated_at": "2024-04-01", "title": "ベンジリデンアセタール化", "compound_id": 1, "implementation_date": "2024-04-01", "memo": "" }] };
+        samplesListContainCompound.value = { "error": false, "errorMessage": "", "content": [{ "current_weight": 0, "id": 1, "label": "KS001 crude", "preparation_date": "2024-04-01", "sample_state": "mixture" }, { "current_weight": 0, "id": 3, "label": "KS001 p2", "preparation_date": "2024-04-02", "sample_state": "pure" }, { "current_weight": 0, "id": 4, "label": "KS002 crude", "preparation_date": "2024-04-04", "sample_state": "mixture" }, { "current_weight": 3.21, "id": 6, "label": "KS002 p2", "preparation_date": "2024-04-04", "sample_state": "pure" }] }
+
+
     }
+    isLoadingDetails.value = false;
 }
 
 
 const getAllCompoundsList = async () => {
     isLoadingList.value = true;
     try {
-        compoundsList.value = await fetch('./api/getAllCompounds.php')
+        compoundsList.value = await fetch('./api_lms/getAllCompoundsList.php')
             .then(function (res) {
                 return res.json()
             })
     } catch {
-        compoundsList.value = [
-            {
-                "compound_id": 1,
-                "compound_name": "テスト1"
-            },
-            {
-                "compound_id": 2,
-                "compound_name": "テスト2"
-            },
-            {
-                "compound_id": 3,
-                "compound_name": "テスト3"
-            },
-            {
-                "compound_id": 4,
-                "compound_name": "テスト4"
-            },
-            {
-                "compound_id": 5,
-                "compound_name": "テスト5"
-            }]
+        compoundsList.value = { "error": false, "errorMessage": "", "content": [{ "id": 1, "created_at": "2024-04-01", "updated_at": "2024-04-01", "name": "ベンジリデンアセタール", "image_url": "..\/res\/images\/compound1.bmp", "memo": "" }, { "id": 2, "created_at": "2024-04-01", "updated_at": "2024-04-01", "name": "トシラート", "image_url": "..\/res\/images\/compound2.bmp", "memo": "" }, { "id": 3, "created_at": "2024-04-01", "updated_at": "2024-04-01", "name": "エポキシド", "image_url": "..\/res\/images\/compound3.bmp", "memo": "" }, { "id": 10, "created_at": "2024-05-06", "updated_at": "2024-05-06", "name": "化合物名", "image_url": "化合物名_2tbqok79dkcgc8wgw00okkwogwsocoscko0ksgwkc8gs4ogg", "memo": "shirew" }, { "id": 11, "created_at": "2024-05-06", "updated_at": "2024-05-06", "name": "化合物名", "image_url": "化合物名_65qb12hfpm8s0g0gwscswkgw8sso4wg0wcs8w0ckckwswc84", "memo": "shirew" }, { "id": 12, "created_at": "2024-05-07", "updated_at": "2024-05-07", "name": "klhih", "image_url": "klhih_4hzoaizftc4kcss4g8sg0ssg4ok0k0808cgc0008s4w8cw8s", "memo": "fy" }] }
     }
     isLoadingList.value = false;
 }
 
-const getCompoundDetails = async (compoundId: number) => {
-    currentCompoundDetails.value = await fetch('./api/getCompoundDetails.php', {
+const getCompoundInfo = async (compoundId: number) => {
+    currentCompoundDetails.value = await fetch('./api_lms/getCompoundInfo.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -96,8 +67,24 @@ const getCompoundDetails = async (compoundId: number) => {
     })
 }
 
-const getExperimentDetails1 = async (compoundId: number) => {
-    experiemntList1.value = await fetch('./api/getExperimentsList1.php', {
+const getExperimentsListToSynthesisTargetCompound = async (compoundId: number) => {
+    experimentsListToSynthesisTargetCompound.value = await fetch('./api_lms/getExperimentsListToSynthesisTargetCompound.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'compoundId': compoundId
+        })
+    }).then(function (res) {
+        return res.json();
+    }).catch(function () {
+        throw new Error;
+    })
+}
+
+const getSamplesListContainCompound = async (compoundId: number) => {
+    samplesListContainCompound.value = await fetch('./api_lms/getSamplesListContainCompound.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -132,24 +119,30 @@ onMounted(() => {
                 </div>
             </div>
             <div class="cm-compounds-list">
-                <div v-if="isLoadingList">
+                <div v-if="isLoadingList || compoundsList == null">
                     Loading...
                 </div>
-                <div v-else v-for="compound in compoundsList" class="cm-item"
-                    @click="setCurrentCompoundDetail(compound['compound_id'])">
-                    <img v-bind:src="compound['compound_image_url']">
+                <div v-else-if="compoundsList['error']">
+                    データ取得に失敗しました。
+                </div>
+                <div v-else-if="compoundsList['content'].length == 0">
+                    登録されている化合物がありません。
+                </div>
+                <div v-else v-for="compound in compoundsList['content']" class="cm-item"
+                    @click="setCurrentCompoundDetails(compound['id'])">
+                    <img v-bind:src="compound['image_url']">
                     <div>
-                        <p>{{ compound['compound_name'] }}</p>
-                        <p>重量</p>
+                        <p>{{ compound['name'] }}</p>
+                        <small>重量</small>
                     </div>
                 </div>
             </div>
         </div>
         <div class="cm-main-content">
-            <div class="cm-main-content-default" v-if="currentMode == ''">
+            <div class="cm-main-content-default" v-if="!isDetailsShown">
                 <v-icon :icon=mdiMolecule size="40" color="rgb(174, 174, 174)"></v-icon>
             </div>
-            <div v-if="currentMode == 'detail'">
+            <div v-if="isDetailsShown">
                 <div class="cm-header">
                     <div class="cm-header-left">
                         <p>詳細画面</p>
@@ -157,18 +150,24 @@ onMounted(() => {
                     <div class="cm-header-right">
                     </div>
                 </div>
-                <div class="cm-details-area">
+                <div v-if="isLoadingDetails">
+                    Loading...
+                </div>
+                <div v-else-if="currentCompoundDetails == null || currentCompoundDetails['error']">
+                    データ取得に失敗しました。
+                </div>
+                <div v-else class="cm-details-area">
                     <div class="cm-details-subarea">
                         <div class="cm-details-cm-info">
-                            <img v-bind:src="currentCompoundDetails['compound'][0]['compound_image_url']">
+                            <img v-bind:src="currentCompoundDetails['content'][0]['image_url']">
                             <div>
                                 <div>
                                     <div class="cm-details-cm-info-item-nav">化合物ID</div>
-                                    {{ currentCompoundDetails['compound'][0]['compound_id'] }}
+                                    {{ currentCompoundDetails['content'][0]['id'] }}
                                 </div>
                                 <div>
                                     <div class="cm-details-cm-info-item-nav">化合物名</div>
-                                    {{ currentCompoundDetails['compound'][0]['compound_name'] }}
+                                    {{ currentCompoundDetails['content'][0]['name'] }}
                                 </div>
                                 <div>
                                     <div class="cm-details-cm-info-item-nav">現在の総重量</div>
@@ -180,19 +179,23 @@ onMounted(() => {
                     <div class="cm-details-subarea">
                         <div class="cm-table-area">
                             <h2>この化合物を合成する実験</h2>
-                            <table style="width: 100%;">
+                            <div
+                                v-if="experimentsListToSynthesisTargetCompound['error'] || experimentsListToSynthesisTargetCompound['content'] == null">
+                                データ取得に失敗しました。
+                            </div>
+                            <table v-else style="width: 100%;">
                                 <tbody>
                                     <tr>
                                         <th width="90">実験ID</th>
                                         <th width="110">実施日</th>
                                         <th>実験題目</th>
                                     </tr>
-                                    <tr v-for="experiment in experiemntList1">
+                                    <tr v-for="experiment in experimentsListToSynthesisTargetCompound['content']">
                                         <td>
-                                            <span>KS</span>{{ experiment['experiment_id'].toString().padStart(3, '0') }}
+                                            <span>KS</span>{{ experiment['id'].toString().padStart(3, '0') }}
                                         </td>
                                         <td>
-                                            {{ experiment['timestamp'] }}
+                                            {{ experiment['implementation_date'] }}
                                         </td>
                                         <td>
                                             <span>準備中</span>
@@ -205,19 +208,26 @@ onMounted(() => {
                     <div class="cm-details-subarea">
                         <div class="cm-table-area">
                             <h2>この化合物を使用する実験</h2>
-                            <table style="width: 100%;">
+                            <div
+                                v-if="experimentsListToSynthesisTargetCompound == null || experimentsListToSynthesisTargetCompound['error']">
+                                　データ取得に失敗しました。
+                            </div>
+                            <div v-else-if="experimentsListToSynthesisTargetCompound['content'].length == 0">
+                                　該当するデータがありません。
+                            </div>
+                            <table v-else style="width: 100%;">
                                 <tbody>
                                     <tr>
                                         <th width="90">実験ID</th>
                                         <th width="110">実施日</th>
                                         <th>実験題目</th>
                                     </tr>
-                                    <tr v-for="experiment in experiemntList1">
+                                    <tr v-for="experiment in experimentsListToSynthesisTargetCompound['content']">
                                         <td>
-                                            KS{{ experiment['experiment_id'].toString().padStart(3, '0') }}
+                                            KS{{ experiment['id'].toString().padStart(3, '0') }}
                                         </td>
                                         <td>
-                                            {{ experiment['timestamp'] }}
+                                            {{ experiment['implementation_date'] }}
                                         </td>
                                         <td>
                                             <span>準備中</span>
@@ -228,15 +238,55 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="cm-details-subarea">
-                        <h2>この化合物を含むサンプル</h2>
+                        <div class="cm-table-area">
+                            <h2>この化合物を含むサンプル</h2>
+                            <div v-if="samplesListContainCompound == null || samplesListContainCompound['error']">
+                                　データ取得に失敗しました。
+                            </div>
+                            <div v-else-if="samplesListContainCompound['content'].length == 0">
+                                　該当するデータがありません。
+                            </div>
+                            <table v-else style="width: 100%;">
+                                <tbody>
+                                    <tr>
+                                        <th width="110">サンプルID</th>
+                                        <th width="110">保存日</th>
+                                        <th>ラベル名</th>
+                                        <th>現在の重量</th>
+                                        <th>状態</th>
+                                    </tr>
+                                    <tr v-for="sample in samplesListContainCompound['content']">
+                                        <td>
+                                            {{ sample['id'] }}
+                                        </td>
+                                        <td>
+                                            {{ sample['preparation_date'] }}
+                                        </td>
+                                        <td>
+                                            {{ sample['label'] }}
+                                        </td>
+                                        <td>
+                                            {{ sample['current_weight'] + 'g' }}
+                                        </td>
+                                        <td>
+                                            {{ sample['sample_state'] }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <Teleport to="body">
-        <InsertCompoundModal :show="showInsertCompoundModal" @close="showInsertCompoundModal = false" @create="(memoTitle: string) => {
-                            // saveMemo(memoTitle, '');
+        <InsertCompoundModal :show="showInsertCompoundModal" @close="showInsertCompoundModal = false" @submit="async () => {
+                            await sleep(0.5);
+                            isLoadingList = true;
+                            await getAllCompoundsList();
+                            isLoadingList = false;
+                            isDetailsShown = false;
                             showInsertCompoundModal = false;
                         }">
         </InsertCompoundModal>
@@ -252,8 +302,7 @@ onMounted(() => {
 .cm-side-bar {
     width: 30vw;
     height: calc(100vh - 35px);
-    border-right: 1px solid white;
-
+    border-right: 1px solid rgb(200, 200, 200);
 }
 
 .cm-header {

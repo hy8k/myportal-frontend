@@ -101,7 +101,9 @@ const setWidgetContent = () => {
                 'message': '¥' + EURToJPYRate.toString().substring(0, 6)
             });
         })
-        .catch()
+        .catch(e => {
+            console.log(e);
+        });
 }
 
 setWidgetContent();
