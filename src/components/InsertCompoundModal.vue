@@ -12,9 +12,10 @@ const isCompoundFormValid = ref(false);
 const sleep = (second: number) => new Promise(resolve => setTimeout(resolve, second * 1000))
 
 
-const onImageUploaded = (files: File[]) => {
-    if (files.length > 0) {
-        const file = files[0];
+const onImageUploaded = (f: File | File[]) => {
+    const file = f as File;
+    if (file != null) {
+        // const file = files[0];
         const fileReader = new FileReader();
         fileReader.addEventListener(
             "load",
@@ -71,11 +72,11 @@ const insertCompound = async (name: string, image: string, memo: string) => {
                         @submit.prevent="insertCompound(compoundName, compoundImage, compoundMemo)">
                         <div class="modal-body">
                             <v-text-field class="form-item" label="化合物名" v-model="compoundName"
-                                :rules="[(v: string) => !!v || '入力してください。']" required></v-text-field>
+                                :rules="[(v: string) => !!v || '必須項目です。']" width="300"></v-text-field>
                             <v-textarea class="form-item" label="メモ" rows="2" no-resize
                                 v-model="compoundMemo"></v-textarea>
                             <v-file-input class="form-item" label="化合物の構造式（BMPファイルのみ）"
-                                @update:model-value="onImageUploaded" accept="image/bmp"></v-file-input>
+                                @update:model-value="onImageUploaded" accept="image/bmp" width="400"></v-file-input>
                             <p>プレビュー</p>
                             <img v-if="compoundImage == ''"
                                 src="../assets/images/image-off.png" width="70">
@@ -111,7 +112,6 @@ const insertCompound = async (name: string, image: string, memo: string) => {
     display: flex;
     flex-direction: column;
     width: 500px;
-    height: 42vw;
     margin: auto;
     padding: 20px 20px;
     background-color: #fff;
@@ -138,7 +138,8 @@ const insertCompound = async (name: string, image: string, memo: string) => {
 }
 
 .form-item {
-    padding: 5px 0;
+    padding: 5px;
+    flex-grow: 0;
 }
 
 .modal-body input {

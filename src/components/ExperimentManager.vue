@@ -10,52 +10,76 @@ import {
 import InsertExperimentModal from '@/components/InsertExperimentModal.vue';
 
 const showInsertExperimentModal = ref(false);
-const currentMode = ref("");
+const isDetailsShown = ref(false);
 const experimentsList = ref();
+const samplesListOfExperiment = ref();
 const currentExperimentDetails = ref();
 const isLoadingList = ref(false);
+const sleep = (second: number) => new Promise(resolve => setTimeout(resolve, second * 1000))
+
 
 const setCurrentExperimentDetails = async (experimentId: number) => {
     try {
-        currentExperimentDetails.value = await fetch('./api/getExperimentDetails.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'experimentId': experimentId
-            })
-        }).then(function (res) {
-            return res.json();
-        })
-        currentMode.value = 'detail';
+        await getExperimentInfo(experimentId);
+        await getSamplesListOfExperiment(experimentId);
+        isDetailsShown.value = true;
     } catch (e) {
+        isDetailsShown.value = true;
         // currentMode.value = 'error';
-        currentMode.value = 'detail';
-        currentExperimentDetails.value = { "experiment": [{ "experiment_id": 5, "experiment_title": "トシル化", "compound_id": 2, "timestamp": "2024-04-01" }] }
+        currentExperimentDetails.value = { "error": false, "errorMessage": "", "content": [{ "id": 1, "title": "ベンジリデンアセタール化", "implementation_date": "2024-04-01", "memo": "", "compound_name": "ベンジリデンアセタール" }] };
+        samplesListOfExperiment.value = { "error": false, "errorMessage": "", "content": [{ "id": 2, "compound_id": 1, "state_id": 1, "current_weight": 0, "label": "KS002 crude", "memo": "", "preparation_date": "2024-04-04", "compound_name": "ベンジリデンアセタール", "sample_state": "mixture" }, { "id": 2, "compound_id": null, "state_id": 3, "current_weight": 1.233, "label": "KS002 p1 bypro", "memo": "", "preparation_date": "2024-04-04", "compound_name": null, "sample_state": "pure" }, { "id": 2, "compound_id": 1, "state_id": 3, "current_weight": 3.21, "label": "KS002 p2", "memo": "", "preparation_date": "2024-04-04", "compound_name": "ベンジリデンアセタール", "sample_state": "pure" }] }
 
-        console.log(e);
     }
 }
 
 
-const getAllExperiments = async () => {
+const getAllExperimentsList = async () => {
     isLoadingList.value = true;
     try {
-        experimentsList.value = await fetch('./api/getAllExperiments.php')
+        experimentsList.value = await fetch('./api_lms/getAllExperimentsList.php')
             .then(function (res) {
                 return res.json()
             })
-        experimentsList.value.reverse();
     } catch {
-        experimentsList.value = [{ "experiment_id": 1, "timestamp": "2024-04-01", "compound_id": 1, "compound_name": "ベンジリデンアセタール" }, { "experiment_id": 2, "timestamp": "2024-04-01", "compound_id": 1, "compound_name": "ベンジリデンアセタール" }, { "experiment_id": 3, "timestamp": "2024-04-01", "compound_id": 2, "compound_name": "トシラート" }, { "experiment_id": 4, "timestamp": "2024-04-01", "compound_id": 2, "compound_name": "トシラート" }, { "experiment_id": 5, "timestamp": "2024-04-01", "compound_id": 2, "compound_name": "トシラート" }, { "experiment_id": 6, "timestamp": "2024-04-01", "compound_id": 3, "compound_name": "エポキシド" }, { "experiment_id": 7, "timestamp": "2024-04-01", "compound_id": 3, "compound_name": "エポキシド" }]
-        experimentsList.value.reverse();
+        experimentsList.value = { "error": false, "errorMessage": "", "content": [{ "id": 7, "implementation_date": "2024-04-01", "title": "エポキシ化", "compound_name": "エポキシド" }, { "id": 6, "implementation_date": "2024-04-01", "title": "エポキシ化", "compound_name": "エポキシド" }, { "id": 5, "implementation_date": "2024-04-01", "title": "トシル化", "compound_name": "トシラート" }, { "id": 4, "implementation_date": "2024-04-01", "title": "トシル化", "compound_name": "トシラート" }, { "id": 3, "implementation_date": "2024-04-01", "title": "トシル化", "compound_name": "トシラート" }, { "id": 2, "implementation_date": "2024-04-01", "title": "ベンジリデンアセタール化", "compound_name": "ベンジリデンアセタール" }, { "id": 1, "implementation_date": "2024-04-01", "title": "ベンジリデンアセタール化", "compound_name": "ベンジリデンアセタール" }] };
     }
     isLoadingList.value = false;
 }
 
+const getExperimentInfo = async (experimentId: number) => {
+    currentExperimentDetails.value = await fetch('./api_lms/getExperimentInfo.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'experimentId': experimentId
+        })
+    }).then(function (res) {
+        return res.json();
+    }).catch(function () {
+        throw new Error;
+    })
+}
+
+const getSamplesListOfExperiment = async (experimentId: number) => {
+    samplesListOfExperiment.value = await fetch('./api_lms/getSamplesListOfExperiment.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'experimentId': experimentId
+        })
+    }).then(function (res) {
+        return res.json();
+    }).catch(function () {
+        throw new Error;
+    })
+}
+
 onMounted(() => {
-    getAllExperiments();
+    getAllExperimentsList();
 })
 </script>
 <template>
@@ -70,19 +94,23 @@ onMounted(() => {
                         <v-icon :icon="mdiMagnify" size=20 color="rgb(95, 95, 95)"></v-icon>
                     </button>
                     <button class="btn-default btn-small">
-                        <v-icon @click="showInsertExperimentModal = true" :icon="mdiPlus" size=20 color="rgb(95, 95, 95)"></v-icon>
+                        <v-icon @click="showInsertExperimentModal = true" :icon="mdiPlus" size=20
+                            color="rgb(95, 95, 95)"></v-icon>
                     </button>
                 </div>
             </div>
             <div class="em-experiments-list">
-                <div v-if="isLoadingList">
+                <div v-if="isLoadingList || experimentsList == null">
                     Loading...
                 </div>
-                <div v-else v-for="experiment in experimentsList" class="em-item"
-                    @click="setCurrentExperimentDetails(experiment['experiment_id'])">
+                <div v-else-if="experimentsList['error']">
+                    データ取得に失敗しました。
+                </div>
+                <div v-else v-for="experiment in experimentsList['content']" class="em-item"
+                    @click="setCurrentExperimentDetails(experiment['id'])">
                     <div>
-                        <p>KS{{ experiment['experiment_id'].toString().padStart(3, '0') }} {{
-                            experiment['compound_name'] }}</p>
+                        <p>KS{{ experiment['id'].toString().padStart(3, '0') }} {{
+                            experiment['title'] }}</p>
                     </div>
                 </div>
             </div>
@@ -91,7 +119,7 @@ onMounted(() => {
             <div class="em-main-content-default" v-if="currentMode == ''">
                 <v-icon :icon=mdiTestTube size="40" color="rgb(174, 174, 174)"></v-icon>
             </div>
-            <div v-if="currentMode == 'detail'">
+            <div v-if="isDetailsShown">
                 <div class="em-header">
                     <div class="em-header-left">
                         <p>詳細画面</p>
@@ -102,40 +130,105 @@ onMounted(() => {
                 <div class="em-details-area">
                     <div class="em-details-subarea">
                         <div class="em-details-em-info">
-                            <!-- <p>{{ currentExperimentDetails['compound'][0]['compound_name'] }}</p> -->
-                            <div class="em-details-em-info-item">
-                                <div class="em-details-em-info-item-nav">
-                                    実験ID
+                            <div class="em-details-em-info-column">
+                                <!-- <p>{{ currentExperimentDetails['compound'][0]['compound_name'] }}</p> -->
+                                <div class="em-details-em-info-column-item">
+                                    <div class="em-details-em-info-column-item-nav">
+                                        実験ID
+                                    </div>
+                                    KS{{ currentExperimentDetails['content'][0]['id'].toString().padStart(3, '0') }}
                                 </div>
-                                KS{{ currentExperimentDetails['experiment'][0]['experiment_id'].toString().padStart(3,
-                                '0') }}
+                                <div class="em-details-em-info-column-item">
+                                    <div class="em-details-em-info-column-item-nav">
+                                        実験題目
+                                    </div>
+                                    {{ currentExperimentDetails['content'][0]['title'] }}
+                                </div>
+
                             </div>
-                            <div class="em-details-em-info-item">
-                                <div class="em-details-em-info-item-nav">
-                                    実験題目
+                            <div class="em-details-em-info-column">
+                                <div class="em-details-em-info-column-item">
+                                    <div class="em-details-em-info-column-item-nav">
+                                        目的化合物
+                                    </div>
+                                    {{ currentExperimentDetails['content'][0]['compound_name'] }}
                                 </div>
-                                準備中
+                                <div class="em-details-em-info-column-item">
+                                    <div class="em-details-em-info-column-item-nav">
+                                        実験実施日
+                                    </div>
+                                    {{ currentExperimentDetails['content'][0]['implementation_date'] }}
+                                </div>
                             </div>
-                            <div class="em-details-em-info-item">
-                                <div class="em-details-em-info-item-nav">
-                                    目的化合物
+                            <div class="em-details-em-info-column">
+                                <div class="em-details-em-info-column-item">
+                                    <div class="em-details-em-info-column-item-nav">
+                                        メモ
+                                    </div>
+                                    <div v-if="currentExperimentDetails['content'][0]['memo'] == ''">
+                                        なし
+                                    </div>
+                                    <div v-else>
+                                        {{ currentExperimentDetails['content'][0]['memo'] }}
+                                    </div>
                                 </div>
-                                準備中
                             </div>
                         </div>
                     </div>
-                    <h2>関連するサンプル</h2>
+                    <div class="em-details-subarea">
+                        <div class="em-table-area">
+                            <h2>実験サンプル</h2>
+                            <div v-if="samplesListOfExperiment == null || samplesListOfExperiment['error']">
+                                　データ取得に失敗しました。
+                            </div>
+                            <div v-else-if="samplesListOfExperiment['content'].length == 0">
+                                　該当するデータがありません。
+                            </div>
+                            <table v-else style="width: 100%;table-layout: fixed;">
+                                <tbody>
+                                    <tr>
+                                        <th width="50">サンプルID</th>
+                                        <th width="50">保存日</th>
+                                        <th width="150">ラベル名</th>
+                                        <th width="50">現在の重量</th>
+                                        <th width="50">状態</th>
+                                    </tr>
+                                    <tr v-for="sample in samplesListOfExperiment['content']">
+                                        <td>
+                                            {{ sample['id'] }}
+                                        </td>
+                                        <td>
+                                            {{ sample['preparation_date'] }}
+                                        </td>
+                                        <td>
+                                            {{ sample['label'] }}
+                                        </td>
+                                        <td>
+                                            {{ sample['current_weight'] + 'g' }}
+                                        </td>
+                                        <td>
+                                            {{ sample['sample_state'] }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <Teleport to="body">
-        <InsertExperimentModal :show="showInsertExperimentModal" @close="showInsertExperimentModal = false" @create="(memoTitle: string) => {
-                            // saveMemo(memoTitle, '');
+        <Teleport to="body">
+            <InsertExperimentModal :show="showInsertExperimentModal" @close="showInsertExperimentModal = false" @submit="async () => {
+                            await sleep(0.5);
+                            isLoadingList = true;
+                            await getAllExperimentsList();
+                            isLoadingList = false;
+                            isDetailsShown = false;
                             showInsertExperimentModal = false;
                         }">
-        </InsertExperimentModal>
-    </Teleport>
+            </InsertExperimentModal>
+        </Teleport>
+    </div>
 </template>
 
 <style scoped>
@@ -209,17 +302,23 @@ onMounted(() => {
     color: rgb(174, 174, 174);
 }
 
-.em-details-em-info {
+.em-details-em-info-column {
     display: flex;
+    margin-bottom: 5px;
 }
 
+.em-details-em-info {
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px;
+}
 
-.em-details-em-info-item {
+.em-details-em-info-column-item {
     flex: 1;
 }
 
 
-.em-details-em-info-item-nav {
+.em-details-em-info-column-item-nav {
     font-weight: 900;
     flex: 1;
 }
@@ -244,5 +343,14 @@ onMounted(() => {
     padding: 20px;
     overflow-y: scroll;
     height: calc(100vh - 75px);
+}
+
+.em-table-area {
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px
+}
+
+.em-table-area>h2 {
+    padding: 10px;
 }
 </style>

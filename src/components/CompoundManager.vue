@@ -163,15 +163,24 @@ onMounted(() => {
                             <div>
                                 <div>
                                     <div class="cm-details-cm-info-item-nav">化合物ID</div>
-                                    {{ currentCompoundDetails['content'][0]['id'] }}
+                                    <span>{{ currentCompoundDetails['content'][0]['id'] }}</span>
                                 </div>
                                 <div>
                                     <div class="cm-details-cm-info-item-nav">化合物名</div>
-                                    {{ currentCompoundDetails['content'][0]['name'] }}
+                                    <span>{{ currentCompoundDetails['content'][0]['name'] }}</span>
                                 </div>
                                 <div>
                                     <div class="cm-details-cm-info-item-nav">現在の総重量</div>
-                                    準備中
+                                    <span>準備中</span>
+                                </div>
+                                <div>
+                                    <div class="cm-details-cm-info-item-nav">メモ</div>
+                                    <div v-if="currentCompoundDetails['content'][0]['memo'] == ''">
+                                        <span>なし</span>
+                                    </div>
+                                    <div v-else>
+                                        <span>{{ currentCompoundDetails['content'][0]['memo'] }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -183,12 +192,12 @@ onMounted(() => {
                                 v-if="experimentsListToSynthesisTargetCompound['error'] || experimentsListToSynthesisTargetCompound['content'] == null">
                                 データ取得に失敗しました。
                             </div>
-                            <table v-else style="width: 100%;">
+                            <table v-else style="width: 100%;table-layout: fixed;">
                                 <tbody>
                                     <tr>
-                                        <th width="90">実験ID</th>
-                                        <th width="110">実施日</th>
-                                        <th>実験題目</th>
+                                        <th width="50">実験ID</th>
+                                        <th width="50">実施日</th>
+                                        <th width="220">実験題目</th>
                                     </tr>
                                     <tr v-for="experiment in experimentsListToSynthesisTargetCompound['content']">
                                         <td>
@@ -208,7 +217,8 @@ onMounted(() => {
                     <div class="cm-details-subarea">
                         <div class="cm-table-area">
                             <h2>この化合物を使用する実験</h2>
-                            <div
+                            準備中
+                            <!-- <div
                                 v-if="experimentsListToSynthesisTargetCompound == null || experimentsListToSynthesisTargetCompound['error']">
                                 　データ取得に失敗しました。
                             </div>
@@ -234,7 +244,7 @@ onMounted(() => {
                                         </td>
                                     </tr>
                                 </tbody>
-                            </table>
+                            </table> -->
                         </div>
                     </div>
                     <div class="cm-details-subarea">
@@ -246,14 +256,14 @@ onMounted(() => {
                             <div v-else-if="samplesListContainCompound['content'].length == 0">
                                 　該当するデータがありません。
                             </div>
-                            <table v-else style="width: 100%;">
+                            <table v-else style="width: 100%;table-layout: fixed;">
                                 <tbody>
                                     <tr>
-                                        <th width="110">サンプルID</th>
-                                        <th width="110">保存日</th>
-                                        <th>ラベル名</th>
-                                        <th>現在の重量</th>
-                                        <th>状態</th>
+                                        <th width="40">サンプルID</th>
+                                        <th width="50">保存日</th>
+                                        <th width="150">ラベル名</th>
+                                        <th width="50">現在の重量</th>
+                                        <th width="50">状態</th>
                                     </tr>
                                     <tr v-for="sample in samplesListContainCompound['content']">
                                         <td>
@@ -372,6 +382,9 @@ onMounted(() => {
 
 .cm-details-cm-info {
     display: flex;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px;
 }
 
 .cm-details-cm-info-item-nav {
@@ -407,7 +420,7 @@ onMounted(() => {
 
 .cm-table-area {
     border-radius: 4px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px;
 }
 
 .cm-table-area>h2 {
