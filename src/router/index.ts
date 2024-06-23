@@ -2,6 +2,10 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import MemoView from '../views/MemoView.vue'
 import LaboratoryManagementSystemView from '../views/LaboratoryManagementSystemView.vue'
+import CompoundManager from '@/components/CompoundManager.vue'
+import ExperimentManager from '@/components/ExperimentManager.vue'
+import SampleManager from '@/components/SampleManager.vue'
+import DefaultManager from '@/components/DefaultManager.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -19,7 +23,21 @@ const router = createRouter({
     {
       path: '/lab-management',
       name: 'laboratoryManagementSystem',
-      component: LaboratoryManagementSystemView
+      component: LaboratoryManagementSystemView,
+      children: [
+        {
+          path: 'compound',
+          component: CompoundManager
+        },
+        {
+          path: 'experiment',
+          component: ExperimentManager
+        },
+        {
+          path: 'sample',
+          component: SampleManager
+        },
+      ]
     },
     // {
     //   path: '/expense',

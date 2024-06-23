@@ -133,7 +133,6 @@ onMounted(() => {
                     <img v-bind:src="compound['image_url']">
                     <div>
                         <p>{{ compound['name'] }}</p>
-                        <small>重量</small>
                     </div>
                 </div>
             </div>
@@ -160,26 +159,49 @@ onMounted(() => {
                     <div class="cm-details-subarea">
                         <div class="cm-details-cm-info">
                             <img v-bind:src="currentCompoundDetails['content'][0]['image_url']">
-                            <div>
-                                <div>
-                                    <div class="cm-details-cm-info-item-nav">化合物ID</div>
-                                    <span>{{ currentCompoundDetails['content'][0]['id'] }}</span>
-                                </div>
-                                <div>
-                                    <div class="cm-details-cm-info-item-nav">化合物名</div>
-                                    <span>{{ currentCompoundDetails['content'][0]['name'] }}</span>
-                                </div>
-                                <div>
-                                    <div class="cm-details-cm-info-item-nav">現在の総重量</div>
-                                    <span>準備中</span>
-                                </div>
-                                <div>
-                                    <div class="cm-details-cm-info-item-nav">メモ</div>
-                                    <div v-if="currentCompoundDetails['content'][0]['memo'] == ''">
-                                        <span>なし</span>
+                            <div class="cm-details-cm-info-right">
+                                <div class="cm-details-cm-info-column">
+                                    <div class="cm-details-cm-info-column-item">
+                                        <div class="cm-details-cm-info-item-nav">化合物ID</div>
+                                        <span>{{ currentCompoundDetails['content'][0]['id'] }}</span>
                                     </div>
-                                    <div v-else>
-                                        <span>{{ currentCompoundDetails['content'][0]['memo'] }}</span>
+                                    <div class="cm-details-cm-info-column-item">
+                                        <div class="cm-details-cm-info-item-nav">化合物名</div>
+                                        <span>{{ currentCompoundDetails['content'][0]['name'] }}</span>
+                                    </div>
+                                </div>
+                                <div class="cm-details-cm-info-column">
+                                    <div class="cm-details-cm-info-column-item">
+                                        <div class="cm-details-cm-info-item-nav">重量(pure)</div>
+                                        <p>{{
+                            currentCompoundDetails['content'][0]['total_amount_pure'] ===
+                                null ?
+                                0 : currentCompoundDetails['content'][0]['total_amount_pure'] }}g</p>
+                                    </div>
+                                    <div class="cm-details-cm-info-column-item">
+                                        <div class="cm-details-cm-info-item-nav">重量(semi-pure)</div>
+                                        <p>{{
+                            currentCompoundDetails['content'][0]['total_amount_semi_pure'] ===
+                                null ?
+                                0 : currentCompoundDetails['content'][0]['total_amount_semi_pure'] }}g</p>
+                                    </div>
+                                </div>
+                                <div class="cm-details-cm-info-column">
+                                    <div class="cm-details-cm-info-column-item">
+                                        <div class="cm-details-cm-info-item-nav">重量(mixture)</div>
+                                        <p>{{
+                            currentCompoundDetails['content'][0]['total_amount_mixture'] ===
+                                null ?
+                                0 : currentCompoundDetails['content'][0]['total_amount_mixture'] }}g</p>
+                                    </div>
+                                    <div class="cm-details-cm-info-column-item">
+                                        <div class="cm-details-cm-info-item-nav">メモ</div>
+                                        <div v-if="currentCompoundDetails['content'][0]['memo'] == ''">
+                                            <span>なし</span>
+                                        </div>
+                                        <div v-else>
+                                            <span>{{ currentCompoundDetails['content'][0]['memo'] }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -190,7 +212,10 @@ onMounted(() => {
                             <h2>この化合物を合成する実験</h2>
                             <div
                                 v-if="experimentsListToSynthesisTargetCompound['error'] || experimentsListToSynthesisTargetCompound['content'] == null">
-                                データ取得に失敗しました。
+                                　データ取得に失敗しました。
+                            </div>
+                            <div v-else-if="samplesListContainCompound['content'].length == 0">
+                                　該当するデータがありません。
                             </div>
                             <table v-else style="width: 100%;table-layout: fixed;">
                                 <tbody>
@@ -217,7 +242,7 @@ onMounted(() => {
                     <div class="cm-details-subarea">
                         <div class="cm-table-area">
                             <h2>この化合物を使用する実験</h2>
-                            準備中
+                            　準備中
                             <!-- <div
                                 v-if="experimentsListToSynthesisTargetCompound == null || experimentsListToSynthesisTargetCompound['error']">
                                 　データ取得に失敗しました。
@@ -307,6 +332,8 @@ onMounted(() => {
 .main-area {
     display: flex;
     width: 97.5vw;
+    position: absolute;
+    background-color: white;
 }
 
 .cm-side-bar {
@@ -387,6 +414,10 @@ onMounted(() => {
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px;
 }
 
+.cm-details-cm-info-right {
+    flex: 1;
+}
+
 .cm-details-cm-info-item-nav {
     font-weight: 900;
 }
@@ -402,6 +433,15 @@ onMounted(() => {
     padding: 20px;
     overflow-y: scroll;
     height: calc(100vh - 75px);
+}
+
+.cm-details-cm-info-column {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.cm-details-cm-info-column-item {
+    flex: 1;
 }
 
 .cm-details-ex-list1 {

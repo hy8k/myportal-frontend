@@ -180,6 +180,8 @@ onMounted(() => {
 .main-area {
     display: flex;
     width: 97.5vw;
+    position: absolute;
+    background-color: white;
 }
 
 .sm-side-bar {

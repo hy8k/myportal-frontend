@@ -8,8 +8,10 @@ import {
     mdiMagnify
 } from '@mdi/js'
 import InsertExperimentModal from '@/components/InsertExperimentModal.vue';
+import SearchExperimentsModal from '@/components/SearchExperimentsModal.vue';
 
 const showInsertExperimentModal = ref(false);
+const showSearchExperimentsModal = ref(false);
 const isDetailsShown = ref(false);
 const experimentsList = ref();
 const samplesListOfExperiment = ref();
@@ -116,7 +118,7 @@ onMounted(() => {
             </div>
         </div>
         <div class="em-main-content">
-            <div class="em-main-content-default" v-if="currentMode == ''">
+            <div class="em-main-content-default" v-if="!isDetailsShown">
                 <v-icon :icon=mdiTestTube size="40" color="rgb(174, 174, 174)"></v-icon>
             </div>
             <div v-if="isDetailsShown">
@@ -161,16 +163,18 @@ onMounted(() => {
                                 </div>
                             </div>
                             <div class="em-details-em-info-column">
-                                <div class="em-details-em-info-column-item">
+                                <div class="em-details-em-info-column-item"
+                                    v-if="currentExperimentDetails['content'][0]['memo'] == ''">
                                     <div class="em-details-em-info-column-item-nav">
                                         メモ
                                     </div>
-                                    <div v-if="currentExperimentDetails['content'][0]['memo'] == ''">
-                                        なし
+                                    なし
+                                </div>
+                                <div class="em-details-em-info-column-item" v-else>
+                                    <div class="em-details-em-info-column-item-nav">
+                                        メモ
                                     </div>
-                                    <div v-else>
-                                        {{ currentExperimentDetails['content'][0]['memo'] }}
-                                    </div>
+                                    {{ currentExperimentDetails['content'][0]['memo'] }}
                                 </div>
                             </div>
                         </div>
@@ -227,6 +231,15 @@ onMounted(() => {
                             showInsertExperimentModal = false;
                         }">
             </InsertExperimentModal>
+            <!-- <SearchtExperimentModal :show="showInsertExperimentModal" @close="showInsertExperimentModal = false" @submit="async () => {
+                            await sleep(0.5);
+                            isLoadingList = true;
+                            await getAllExperimentsList();
+                            isLoadingList = false;
+                            isDetailsShown = false;
+                            showInsertExperimentModal = false;
+                        }">
+            </SearchExperimentModal> -->
         </Teleport>
     </div>
 </template>
@@ -235,6 +248,8 @@ onMounted(() => {
 .main-area {
     display: flex;
     width: 97.5vw;
+    position: absolute;
+    background-color: white;
 }
 
 .em-side-bar {
