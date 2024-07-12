@@ -12,7 +12,6 @@ import SearchExperimentsModal from '@/components/SearchExperimentsModal.vue';
 
 const showInsertExperimentModal = ref(false);
 const showSearchExperimentsModal = ref(false);
-const isDetailsShown = ref(false);
 const experimentsList = ref();
 const samplesListOfExperiment = ref();
 const currentExperimentDetails = ref();
@@ -24,9 +23,7 @@ const setCurrentExperimentDetails = async (experimentId: number) => {
     try {
         await getExperimentInfo(experimentId);
         await getSamplesListOfExperiment(experimentId);
-        isDetailsShown.value = true;
     } catch (e) {
-        isDetailsShown.value = true;
         // currentMode.value = 'error';
         currentExperimentDetails.value = { "error": false, "errorMessage": "", "content": [{ "id": 1, "title": "ベンジリデンアセタール化", "implementation_date": "2024-04-01", "memo": "", "compound_name": "ベンジリデンアセタール" }] };
         samplesListOfExperiment.value = { "error": false, "errorMessage": "", "content": [{ "id": 2, "compound_id": 1, "state_id": 1, "current_weight": 0, "label": "KS002 crude", "memo": "", "preparation_date": "2024-04-04", "compound_name": "ベンジリデンアセタール", "sample_state": "mixture" }, { "id": 2, "compound_id": null, "state_id": 3, "current_weight": 1.233, "label": "KS002 p1 bypro", "memo": "", "preparation_date": "2024-04-04", "compound_name": null, "sample_state": "pure" }, { "id": 2, "compound_id": 1, "state_id": 3, "current_weight": 3.21, "label": "KS002 p2", "memo": "", "preparation_date": "2024-04-04", "compound_name": "ベンジリデンアセタール", "sample_state": "pure" }] }
@@ -108,118 +105,23 @@ onMounted(() => {
                 <div v-else-if="experimentsList['error']">
                     データ取得に失敗しました。
                 </div>
-                <div v-else v-for="experiment in experimentsList['content']" class="em-item"
+                <div v-else-if="experimentsList['content'].length == 0">
+                    登録されている実験がありません。
+                </div>
+                <router-link :to="('/lab-management/experiment/' + experiment['id']).toString()" v-else v-for="experiment in experimentsList['content']" class="em-item"
                     @click="setCurrentExperimentDetails(experiment['id'])">
                     <div>
                         <p>KS{{ experiment['id'].toString().padStart(3, '0') }} {{
                             experiment['title'] }}</p>
                     </div>
-                </div>
+                </router-link>
             </div>
         </div>
         <div class="em-main-content">
-            <div class="em-main-content-default" v-if="!isDetailsShown">
+            <div class="em-main-content-default">
                 <v-icon :icon=mdiTestTube size="40" color="rgb(174, 174, 174)"></v-icon>
             </div>
-            <div v-if="isDetailsShown">
-                <div class="em-header">
-                    <div class="em-header-left">
-                        <p>詳細画面</p>
-                    </div>
-                    <div class="em-header-right">
-                    </div>
-                </div>
-                <div class="em-details-area">
-                    <div class="em-details-subarea">
-                        <div class="em-details-em-info">
-                            <div class="em-details-em-info-column">
-                                <!-- <p>{{ currentExperimentDetails['compound'][0]['compound_name'] }}</p> -->
-                                <div class="em-details-em-info-column-item">
-                                    <div class="em-details-em-info-column-item-nav">
-                                        実験ID
-                                    </div>
-                                    KS{{ currentExperimentDetails['content'][0]['id'].toString().padStart(3, '0') }}
-                                </div>
-                                <div class="em-details-em-info-column-item">
-                                    <div class="em-details-em-info-column-item-nav">
-                                        実験題目
-                                    </div>
-                                    {{ currentExperimentDetails['content'][0]['title'] }}
-                                </div>
-
-                            </div>
-                            <div class="em-details-em-info-column">
-                                <div class="em-details-em-info-column-item">
-                                    <div class="em-details-em-info-column-item-nav">
-                                        目的化合物
-                                    </div>
-                                    {{ currentExperimentDetails['content'][0]['compound_name'] }}
-                                </div>
-                                <div class="em-details-em-info-column-item">
-                                    <div class="em-details-em-info-column-item-nav">
-                                        実験実施日
-                                    </div>
-                                    {{ currentExperimentDetails['content'][0]['implementation_date'] }}
-                                </div>
-                            </div>
-                            <div class="em-details-em-info-column">
-                                <div class="em-details-em-info-column-item"
-                                    v-if="currentExperimentDetails['content'][0]['memo'] == ''">
-                                    <div class="em-details-em-info-column-item-nav">
-                                        メモ
-                                    </div>
-                                    なし
-                                </div>
-                                <div class="em-details-em-info-column-item" v-else>
-                                    <div class="em-details-em-info-column-item-nav">
-                                        メモ
-                                    </div>
-                                    {{ currentExperimentDetails['content'][0]['memo'] }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="em-details-subarea">
-                        <div class="em-table-area">
-                            <h2>実験サンプル</h2>
-                            <div v-if="samplesListOfExperiment == null || samplesListOfExperiment['error']">
-                                　データ取得に失敗しました。
-                            </div>
-                            <div v-else-if="samplesListOfExperiment['content'].length == 0">
-                                　該当するデータがありません。
-                            </div>
-                            <table v-else style="width: 100%;table-layout: fixed;">
-                                <tbody>
-                                    <tr>
-                                        <th width="50">サンプルID</th>
-                                        <th width="50">保存日</th>
-                                        <th width="150">ラベル名</th>
-                                        <th width="50">現在の重量</th>
-                                        <th width="50">状態</th>
-                                    </tr>
-                                    <tr v-for="sample in samplesListOfExperiment['content']">
-                                        <td>
-                                            {{ sample['id'] }}
-                                        </td>
-                                        <td>
-                                            {{ sample['preparation_date'] }}
-                                        </td>
-                                        <td>
-                                            {{ sample['label'] }}
-                                        </td>
-                                        <td>
-                                            {{ sample['current_weight'] + 'g' }}
-                                        </td>
-                                        <td>
-                                            {{ sample['sample_state'] }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <router-view />
         </div>
         <Teleport to="body">
             <InsertExperimentModal :show="showInsertExperimentModal" @close="showInsertExperimentModal = false" @submit="async () => {
@@ -227,7 +129,6 @@ onMounted(() => {
                             isLoadingList = true;
                             await getAllExperimentsList();
                             isLoadingList = false;
-                            isDetailsShown = false;
                             showInsertExperimentModal = false;
                         }">
             </InsertExperimentModal>
@@ -297,6 +198,8 @@ onMounted(() => {
     border-bottom: 1px solid rgb(200, 200, 200);
     cursor: pointer;
     align-items: center;
+    text-decoration: none;
+    color:black;
 }
 
 .em-item:hover {
@@ -308,6 +211,7 @@ onMounted(() => {
 }
 
 .em-main-content-default {
+    width: 67.5vw;
     flex: 6;
     display: flex;
     justify-content: center;
@@ -315,6 +219,7 @@ onMounted(() => {
     height: calc(100vh - 35px);
     font-size: 20px;
     color: rgb(174, 174, 174);
+    position: absolute;
 }
 
 .em-details-em-info-column {

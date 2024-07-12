@@ -20,12 +20,6 @@ const setCurrentContent = (content: string) => {
 
 
 export default {
-    components: {
-        CompoundManager,
-        ExperimentManager,
-        SampleManager
-    },
-
     setup() {
         return {
             currentContent,

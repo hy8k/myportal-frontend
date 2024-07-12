@@ -5,7 +5,9 @@ import LaboratoryManagementSystemView from '../views/LaboratoryManagementSystemV
 import CompoundManager from '@/components/CompoundManager.vue'
 import ExperimentManager from '@/components/ExperimentManager.vue'
 import SampleManager from '@/components/SampleManager.vue'
-import DefaultManager from '@/components/DefaultManager.vue'
+import CompoundDetails from '@/components/CompoundDetails.vue'
+import ExperimentDetails from '@/components/ExperimentDetails.vue'
+import SampleDetails from '@/components/SampleDetails.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -27,15 +29,33 @@ const router = createRouter({
       children: [
         {
           path: 'compound',
-          component: CompoundManager
+          component: CompoundManager,
+          children: [
+            {
+              path: ':id',
+              component: CompoundDetails
+            }
+          ]
         },
         {
           path: 'experiment',
-          component: ExperimentManager
+          component: ExperimentManager,
+          children: [
+            {
+              path: ':id',
+              component: ExperimentDetails
+            }
+          ]
         },
         {
           path: 'sample',
-          component: SampleManager
+          component: SampleManager,
+          children: [
+            {
+              path: ':id',
+              component: SampleDetails
+            }
+          ]
         },
       ]
     },

@@ -2,8 +2,6 @@
 import { onMounted } from 'vue';
 import { ref } from 'vue';
 import {
-    mdiFileQuestion,
-    mdiTestTube,
     mdiBottleTonic,
     mdiPlus,
     mdiMagnify
@@ -11,52 +9,26 @@ import {
 import InsertSampleModal from '@/components/InsertSampleModal.vue';
 
 const showInsertSampleModal = ref(false);
-const currentMode = ref("");
 const samplesList = ref();
-const currentSampleDetails = ref()
 const isLoadingList = ref(false);
+const sleep = (second: number) => new Promise(resolve => setTimeout(resolve, second * 1000));
 
-const setCurrentSampleDetails = async (sampleId: number) => {
-    try {
-        currentSampleDetails.value = await fetch('./api_lms/getSampleInfo.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'sampleId': sampleId
-            })
-        }).then(function (res) {
-            return res.json();
-        })
-        currentMode.value = 'detail';
-    } catch (e) {
-        // currentMode.value = 'error';
-        currentSampleDetails.value = { "error": false, "errorMessage": "", "content": [{ "id": 1, "created_at": "2024-04-01", "updated_at": "2024-04-01", "compound_id": 1, "state_id": 1, "current_weight": 0, "label": "KS001 crude", "memo": "", "preparation_date": "2024-04-01" }] };
-
-        currentMode.value = 'detail';
-        console.log(e);
-    }
-}
-
-
-const getAllSamples = async () => {
+const getAllSamplesList = async () => {
+    isLoadingList.value = true;
     try {
         samplesList.value = await fetch('./api_lms/getAllSamplesList.php')
             .then(function (res) {
                 return res.json()
             })
-        samplesList.value.reverse();
     } catch {
         samplesList.value = { "error": false, "errorMessage": "", "content": [{ "id": 1, "created_at": "2024-04-01", "updated_at": "2024-04-01", "compound_id": 1, "state_id": 1, "current_weight": 0, "label": "KS001 crude", "memo": "", "preparation_date": "2024-04-01" }, { "id": 2, "created_at": "2024-04-02", "updated_at": "2024-04-02", "compound_id": null, "state_id": 2, "current_weight": 0, "label": "KS001 p1 bypro", "memo": "", "preparation_date": "2024-04-02" }, { "id": 3, "created_at": "2024-04-02", "updated_at": "2024-04-02", "compound_id": 1, "state_id": 3, "current_weight": 0, "label": "KS001 p2", "memo": "", "preparation_date": "2024-04-02" }, { "id": 4, "created_at": "2024-04-04", "updated_at": "2024-04-04", "compound_id": 1, "state_id": 1, "current_weight": 0, "label": "KS002 crude", "memo": "", "preparation_date": "2024-04-04" }, { "id": 5, "created_at": "2024-04-04", "updated_at": "2024-04-04", "compound_id": null, "state_id": 3, "current_weight": 1.233, "label": "KS002 p1 bypro", "memo": "", "preparation_date": "2024-04-04" }, { "id": 6, "created_at": "2024-04-04", "updated_at": "2024-04-04", "compound_id": 1, "state_id": 3, "current_weight": 3.21, "label": "KS002 p2", "memo": "", "preparation_date": "2024-04-04" }, { "id": 7, "created_at": "2024-04-05", "updated_at": "2024-04-05", "compound_id": 2, "state_id": 1, "current_weight": 2.324, "label": "KS003 crude", "memo": "", "preparation_date": "2024-04-05" }] };
-
-        samplesList.value.reverse();
     }
+    isLoadingList.value = false;
 }
 
 onMounted(() => {
-    getAllSamples();
-})
+    getAllSamplesList();
+});
 </script>
 
 <template>
@@ -83,93 +55,27 @@ onMounted(() => {
                 <div v-else-if="samplesList['error']">
                     データ取得に失敗しました。
                 </div>
-                <div v-else v-for="sample in samplesList['content']" class="sm-item"
-                    @click="setCurrentSampleDetails(sample['id'])">
+                <router-link :to="('/lab-management/sample/' + sample['id']).toString()" v-else
+                    v-for="sample in samplesList['content']" class="sm-item">
                     <div>
-                        <p> {{ sample['label'] }}</p>
+                        <p>{{ sample['label'] }}</p>
                     </div>
-                </div>
+                </router-link>
             </div>
         </div>
         <div class="sm-main-content">
-            <div class="sm-main-content-default" v-if="currentMode == ''">
+            <div class="sm-main-content-default">
                 <v-icon :icon=mdiBottleTonic size="40" color="rgb(174, 174, 174)"></v-icon>
             </div>
-            <div v-if="currentMode == 'detail'">
-                <div class="sm-header">
-                    <div class="sm-header-left">
-                        <p>詳細画面</p>
-                    </div>
-                    <div class="sm-header-right">
-                    </div>
-                </div>
-                <div class="sm-details-area">
-                    <div class="sm-details-subarea">
-                        <div class="sm-details-sm-info">
-                            <!-- <p>{{ currentSampleDetails['compound'][0]['compound_name'] }}</p> -->
-                            <div class="sm-details-sm-info-item">
-                                <div class="sm-details-sm-info-item-nav">
-                                    サンプルID
-                                </div>
-                                {{ currentSampleDetails['content'][0]['id'] }}
-                            </div>
-                            <div class="sm-details-sm-info-item">
-                                <div class="sm-details-sm-info-item-nav">
-                                    ラベル
-                                </div>
-                                {{ currentSampleDetails['content'][0]['label'] }}
-                            </div>
-
-                        </div>
-                        <div class="sm-details-sm-info">
-                            <div class="sm-details-sm-info-item">
-                                <div class="sm-details-sm-info-item-nav">
-                                    化合物名
-                                </div>
-                                {{ currentSampleDetails['content'][0]['compound_name'] }}
-                            </div>
-                            <div class="sm-details-sm-info-item">
-                                <div class="sm-details-sm-info-item-nav">
-                                    状態
-                                </div>
-                                {{ currentSampleDetails['content'][0]['sample_state'] }}
-                            </div>
-                        </div>
-                        <div class="sm-details-sm-info">
-                            <div class="sm-details-sm-info-item">
-                                <div class="sm-details-sm-info-item-nav">
-                                    現在の重量
-                                </div>
-                                {{ currentSampleDetails['content'][0]['current_weight'] }}g
-                            </div>
-                            <div class="sm-details-sm-info-item">
-                                <div class="sm-details-sm-info-item-nav">
-                                    保存日
-                                </div>
-                                {{  currentSampleDetails['content'][0]['preparation_date'] }}
-                            </div>
-                        </div>
-                        <div class="sm-details-sm-info">
-                            <div class="sm-details-sm-info-item">
-                                <div class="sm-details-sm-info-item-nav">
-                                    メモ
-                                </div>
-                                <div v-if="currentSampleDetails['content'][0]['memo'] == ''">
-                                    なし
-                                </div>
-                                <div v-else>
-                                    {{ currentSampleDetails['content'][0]['memo'] }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <router-view />
         </div>
     </div>
     <Teleport to="body">
-        <InsertSampleModal :show="showInsertSampleModal" @close="showInsertSampleModal = false" @create="(memoTitle: string) => {
-                            // saveMemo(memoTitle, '');
+        <InsertSampleModal :show="showInsertSampleModal" @close="showInsertSampleModal = false" @submit="async () => {
+                            await sleep(0.5);
+                            isLoadingList = true;
+                            await getAllSamplesList();
+                            isLoadingList = false;
                             showInsertSampleModal = false;
                         }">
         </InsertSampleModal>
@@ -228,6 +134,8 @@ onMounted(() => {
     border-bottom: 1px solid rgb(200, 200, 200);
     cursor: pointer;
     align-items: center;
+    text-decoration: none;
+    color: black;
 }
 
 .sm-item:hover {
@@ -236,9 +144,11 @@ onMounted(() => {
 
 .sm-main-content {
     width: 67.5vw;
+    position: relative;
 }
 
 .sm-main-content-default {
+    width: 67.5vw;
     flex: 6;
     display: flex;
     justify-content: center;
@@ -246,6 +156,7 @@ onMounted(() => {
     height: calc(100vh - 35px);
     font-size: 20px;
     color: rgb(174, 174, 174);
+    position: absolute;
 }
 
 .sm-details-sm-info {
