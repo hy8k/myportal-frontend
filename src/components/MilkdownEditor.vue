@@ -12,11 +12,11 @@ import { history } from '@milkdown/plugin-history';
 import { cursor } from '@milkdown/plugin-cursor';
 import { math } from '@milkdown/plugin-math';
 import { splitEditing, splitEditingOptionsCtx } from '@milkdown-lab/plugin-split-editing';
-import { slashFactory } from '@milkdown/plugin-slash';
+// import { slashFactory } from '@milkdown/plugin-slash';
 import { usePluginViewFactory, type VuePluginViewComponent } from '@prosemirror-adapter/vue';
 import { ref, onBeforeUpdate } from 'vue';
 import 'katex/dist/katex.min.css';
-import Slash from './Slash.vue';
+// import Slash from './Slash.vue';
 
 const props = defineProps({
     initialMemoTitle: String,
@@ -30,7 +30,7 @@ const markdownText = ref(props.initialMarkdownText);
 
 const editor = Editor.make();
 
-const tooltip = slashFactory('Commands');
+// const tooltip = slashFactory('Commands');
 const pluginViewFactory = usePluginViewFactory();
 
 useEditor((root) => {
@@ -40,11 +40,11 @@ useEditor((root) => {
         .config((ctx) => {
             ctx.set(rootCtx, root);
             ctx.set(defaultValueCtx, content);
-            ctx.set(tooltip.key, {
-                view: pluginViewFactory({
-                    component: Slash as VuePluginViewComponent
-                }),
-            })
+            // ctx.set(tooltip.key, {
+            //     view: pluginViewFactory({
+            //         component: Slash as VuePluginViewComponent
+            //     }),
+            // })
             ctx.set(splitEditingOptionsCtx.key, {
                 attributes: { class: 'milkdown-split-editor hidden' },
             })
@@ -64,7 +64,7 @@ useEditor((root) => {
         .use(math)
         .use(history)
         .use(listener)
-        .use(tooltip)
+        // .use(tooltip)
         .use(splitEditing);
 });
 
