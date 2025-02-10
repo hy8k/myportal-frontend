@@ -29,3 +29,4 @@ coverage
 
 build.sh
 .env
+.env.local

@@ -41,7 +41,7 @@ const changeMarkdownContent = (memoTitle: string | number) => {
 }
 
 const fetchMemo = async () => {
-    const memoInfoRaw = await fetch(process.env.LIST_API_URL, {
+    const memoInfoRaw = await fetch("https://api-myportal.vercel.app/api/list", {
         headers: {
             "Content-Type": "application/json",
         }
@@ -68,7 +68,7 @@ const saveMemo = async (memoTitle: string, markdownText: string) => {
         'markdownText': markdownText
     };
 
-    const response = await fetch(process.env.SAVE_API_URL, {
+    const response = await fetch("https://api-myportal.vercel.app/api/save", {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
@@ -92,7 +92,7 @@ const renameMemo = async (oldMemoTitle: string, newMemoTitle: string, markdownTe
         'markdownText': markdownText
     };
 
-    const response = await fetch(process.env.RENAME_API_URL, {
+    const response = await fetch("https://api-myportal.vercel.app/api/rename", {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
@@ -115,7 +115,7 @@ const deleteMemo = async () => {
         'memoTitle': initialMemoTitle.value,
     };
 
-    const response = await fetch(process.env.DELETE_API_URL, {
+    const response = await fetch("https://api-myportal.vercel.app/api/delete", {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
