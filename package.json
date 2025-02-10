@@ -52,7 +52,7 @@
     "marked": "^5.0.0",
     "moment": "^2.29.4",
     "patch-package": "^7.0.2",
-    "style-mod": "^4.0.3",
+    "style-mod": "~4.0.3",
     "suncalc": "^1.9.0",
     "tippy.js": "^6.3.7",
     "ts-node": "^10.9.1",
