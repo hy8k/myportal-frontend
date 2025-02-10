@@ -6,7 +6,6 @@ import {
     mdiPen,
     mdiLoading,
     mdiFlaskEmpty,
-    mdiElectronFramework,
 } from '@mdi/js'
 import { store } from '../store.js';
 import Widget from './Widget.vue';
@@ -14,9 +13,8 @@ import Widget from './Widget.vue';
 const headerItems = ref([
     { name: "Home", icon: mdiHome, routerName: "home" },
     { name: "Memo", icon: mdiPen, routerName: "memo" },
-    { name: "SampleManager", icon: mdiFlaskEmpty, routerName: "laboratoryManagementSystem" },
-    // { name: "Article", icon: mdiNewspaper, routerName: "article" },
-    // { name: "Editorial", icon: mdiMessageTextOutline, routerName: "editorial" },
+    // { name: "SampleManager", icon: mdiFlaskEmpty, routerName: "laboratoryManagementSystem" },
+    
 ])
 
 const useCurrentTime = () => {
