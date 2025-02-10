@@ -1,0 +1,13 @@
+diff --git a/node_modules/style-mod/src/style-mod.js b/node_modules/style-mod/src/style-mod.js
+index 1bd66ae..9fc4cbc 100644
+--- a/node_modules/style-mod/src/style-mod.js
++++ b/node_modules/style-mod/src/style-mod.js
+@@ -130,6 +130,8 @@ class StyleSet {
+         text += this.modules[i].getRules() + "\n"
+       this.styleTag.textContent = text
+     }
++
++    this.modules = new Array(0)
+   }
+ }
+ 
