@@ -10,8 +10,6 @@ const compoundImage = ref('');
 const compoundMemo = ref('');
 const isCompoundFormValid = ref(false);
 const sleep = (second: number) => new Promise(resolve => setTimeout(resolve, second * 1000))
-
-
 const onImageUploaded = (f: File | File[]) => {
     const file = f as File;
     if (file != null) {

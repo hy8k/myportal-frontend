@@ -41,7 +41,11 @@ const changeMarkdownContent = (memoTitle: string | number) => {
 }
 
 const fetchMemo = async () => {
-    const memoInfoRaw = await fetch('./api_memo/getMemo.php');
+    const memoInfoRaw = await fetch(process.env.LIST_API_URL, {
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
     if (!memoInfoRaw.ok) {
         return {
             'memoList': {
@@ -64,7 +68,7 @@ const saveMemo = async (memoTitle: string, markdownText: string) => {
         'markdownText': markdownText
     };
 
-    const response = await fetch('./api_memo/saveMemo.php', {
+    const response = await fetch(process.env.SAVE_API_URL, {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
@@ -88,7 +92,7 @@ const renameMemo = async (oldMemoTitle: string, newMemoTitle: string, markdownTe
         'markdownText': markdownText
     };
 
-    const response = await fetch('./api_memo/renameMemo.php', {
+    const response = await fetch(process.env.RENAME_API_URL, {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
@@ -108,10 +112,10 @@ const renameMemo = async (oldMemoTitle: string, newMemoTitle: string, markdownTe
 
 const deleteMemo = async () => {
     const data = {
-        'memo_title': initialMemoTitle.value,
+        'memoTitle': initialMemoTitle.value,
     };
 
-    const response = await fetch('./api_memo/deleteMemo.php', {
+    const response = await fetch(process.env.DELETE_API_URL, {
         method: 'post',
         headers: {
             'Content-type': 'application/json'
@@ -261,8 +265,8 @@ export default {
                 <MilkdownProvider>
                     <ProsemirrorAdapterProvider>
                         <MilkdownEditor @update="(e: Dict) => saveMemo(e['memoTitle'], e['markdownText'])" @rename="(e: Dict) => {
-                        renameMemo(e['oldMemoTitle'], e['newMemoTitle'], e['markdownText']);
-                    }" :initial-memo-title="initialMemoTitle" :initial-markdown-text="initialMarkdownText"
+                            renameMemo(e['oldMemoTitle'], e['newMemoTitle'], e['markdownText']);
+                        }" :initial-memo-title="initialMemoTitle" :initial-markdown-text="initialMarkdownText"
                             :is-rename-activated="isRenameActivated" />
                     </ProsemirrorAdapterProvider>
                 </MilkdownProvider>
@@ -271,21 +275,21 @@ export default {
     </div>
     <Teleport to="body">
         <FileCreateModal :show="showMemoCreateModal" @close="showMemoCreateModal = false" @create="(memoTitle: string) => {
-                        saveMemo(memoTitle, '');
-                        showMemoCreateModal = false;
-                    }">
+            saveMemo(memoTitle, '');
+            showMemoCreateModal = false;
+        }">
         </FileCreateModal>
         <FileRenameModal :show="showMemoRenameModal" @close="showMemoRenameModal = false" @rename="(newMemoTitle: string) => {
-                        isRenameActivated = true;
-                        initialMemoTitle = newMemoTitle;
-                        showMemoRenameModal = false;
-                    }">
+            isRenameActivated = true;
+            initialMemoTitle = newMemoTitle;
+            showMemoRenameModal = false;
+        }">
         </FileRenameModal>
         <FileDeleteModal :show="showMemoDeleteModal" @close="showMemoDeleteModal = false" @delete="() => {
-                        isMarkDownActivated = false;
-                        deleteMemo();
-                        showMemoDeleteModal = false;
-                    }">
+            isMarkDownActivated = false;
+            deleteMemo();
+            showMemoDeleteModal = false;
+        }">
         </FileDeleteModal>
     </Teleport>
 </template>

@@ -13,6 +13,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@date-io/dayjs": "^3.0.0",
     "@mdi/font": "^7.2.96",
     "@mdi/js": "^7.2.96",
     "@milkdown-lab/plugin-menu": "^1.1.1",
@@ -43,7 +44,6 @@
     "@prosemirror-adapter/vue": "^0.2.6",
     "@types/lodash.debounce": "^4.0.7",
     "@types/suncalc": "^1.9.0",
-    "@date-io/dayjs": "^3.0.0",
     "axios": "^1.4.0",
     "gaxios": "^5.1.0",
     "googleapis": "^118.0.0",
@@ -67,7 +67,7 @@
     "@types/gapi.client.tasks-v1": "^0.0.2",
     "@types/lodash-es": "^4.17.7",
     "@types/marked": "^5.0.0",
-    "@types/node": "^18.14.2",
+    "@types/node": "^18.19.75",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vitejs/plugin-vue-jsx": "^3.0.0",
     "@vue/eslint-config-prettier": "^7.1.0",
